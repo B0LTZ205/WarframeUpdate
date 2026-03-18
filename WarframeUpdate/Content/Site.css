@@ -1,0 +1,973 @@
+﻿/* ═══════════════════════════════════════════
+   WARFRAME TRACKER — SITE STYLESHEET
+   Aesthetic: Dark tactical HUD / Orokin tech
+   ═══════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600&family=Share+Tech+Mono&display=swap');
+
+/* ── Variables ─────────────────────────────── */
+:root {
+    --bg: #080c10;
+    --bg-card: #0d1520;
+    --bg-card-alt: #0a1118;
+    --border: #1a3050;
+    --border-glow: #1e4a7a;
+    --accent: #3a9fd8;
+    --accent-dim: #1a5a8a;
+    --accent-glow: rgba(58, 159, 216, 0.15);
+    --gold: #c8a84b;
+    --gold-dim: #7a6020;
+    --red: #d84040;
+    --green: #40d880;
+    --purple: #9a50d8;
+    --text-primary: #d0e8f8;
+    --text-dim: #607090;
+    --text-muted: #3a5070;
+    --font-hud: 'Rajdhani', sans-serif;
+    --font-body: 'Exo 2', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+}
+
+/* ── Reset & Base ──────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ── Atmospheric Effects ───────────────────── */
+.noise-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.4;
+}
+
+.scan-line {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    z-index: 100;
+    animation: scan 8s linear infinite;
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+@keyframes scan {
+    0% {
+        top: 0;
+    }
+
+    100% {
+        top: 100vh;
+    }
+}
+
+/* ── Header ────────────────────────────────── */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(8, 12, 16, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.logo-block {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: inherit;
+    flex-shrink: 0;
+}
+
+.logo-emblem {
+    font-size: 2rem;
+    color: var(--accent);
+    filter: drop-shadow(0 0 8px var(--accent));
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        filter: drop-shadow(0 0 6px var(--accent));
+    }
+
+    50% {
+        filter: drop-shadow(0 0 14px var(--accent));
+    }
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}
+
+.logo-main {
+    font-family: var(--font-hud);
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--text-primary);
+}
+
+.logo-sub {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+}
+
+.header-nav {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: auto;
+}
+
+.nav-link {
+    font-family: var(--font-hud);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+
+    .nav-link:hover {
+        color: var(--accent);
+        border-color: var(--accent-dim);
+        background: var(--accent-glow);
+    }
+
+.header-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--green);
+    flex-shrink: 0;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: blink 2s step-end infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+.header-bar {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--gold), var(--accent), transparent);
+    opacity: 0.5;
+}
+
+/* ── World State Bar ────────────────────────── */
+.world-state-bar {
+    max-width: 1400px;
+    margin: 1.5rem auto 0;
+    padding: 0 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    position: relative;
+    z-index: 1;
+}
+
+.cycle-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: var(--font-hud);
+    font-size: 0.75rem;
+    background: var(--bg-card);
+    letter-spacing: 0.08em;
+}
+
+    .cycle-pill.day {
+        border-color: #7a6020;
+        background: rgba(200, 168, 75, 0.06);
+    }
+
+    .cycle-pill.night {
+        border-color: #1a3a6a;
+        background: rgba(58, 100, 216, 0.06);
+    }
+
+    .cycle-pill.warm {
+        border-color: #7a3020;
+        background: rgba(216, 100, 58, 0.06);
+    }
+
+    .cycle-pill.cold {
+        border-color: #1a4a6a;
+        background: rgba(58, 159, 216, 0.06);
+    }
+
+    .cycle-pill.neutral {
+        border-color: var(--border);
+    }
+
+.cycle-icon {
+    font-size: 0.9rem;
+}
+
+.cycle-label {
+    color: var(--text-dim);
+    font-size: 0.65rem;
+}
+
+.cycle-state {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.cycle-timer {
+    font-family: var(--font-mono);
+    color: var(--accent);
+    font-size: 0.7rem;
+}
+
+/* ── Dashboard Grid ─────────────────────────── */
+.dashboard {
+    max-width: 1400px;
+    margin: 1.5rem auto 4rem;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.25rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Card Base ──────────────────────────────── */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    animation: card-in 0.4s ease both;
+}
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--accent-dim), transparent);
+    }
+
+@keyframes card-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Grid placement */
+.card--sortie {
+    grid-column: span 4;
+    animation-delay: 0.05s;
+}
+
+.card--trader {
+    grid-column: span 4;
+    animation-delay: 0.1s;
+}
+
+.card--nightwave {
+    grid-column: span 4;
+    animation-delay: 0.15s;
+}
+
+.card--fissures {
+    grid-column: span 6;
+    animation-delay: 0.2s;
+}
+
+.card--deals {
+    grid-column: span 3;
+    animation-delay: 0.25s;
+}
+
+.card--invasions {
+    grid-column: span 3;
+    animation-delay: 0.3s;
+}
+
+@media (max-width: 1100px) {
+    .card--sortie, .card--trader, .card--nightwave {
+        grid-column: span 6;
+    }
+
+    .card--fissures {
+        grid-column: span 7;
+    }
+
+    .card--deals {
+        grid-column: span 5;
+    }
+
+    .card--invasions {
+        grid-column: span 12;
+    }
+}
+
+@media (max-width: 720px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        grid-column: span 1 !important;
+    }
+}
+
+/* ── Card Header ────────────────────────────── */
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.card-title-block {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.card-icon {
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 4px var(--accent));
+}
+
+.card-title {
+    font-family: var(--font-hud);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--text-primary);
+}
+
+.card-subtitle {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    display: block;
+    margin-top: 1px;
+}
+
+.text-active {
+    color: var(--green) !important;
+}
+
+.text-inactive {
+    color: var(--text-dim) !important;
+}
+
+.card-timer {
+    text-align: right;
+}
+
+.timer-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    display: block;
+}
+
+.timer-value {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--accent);
+}
+
+/* ── Card Body ──────────────────────────────── */
+.card-body {
+    padding: 1rem 1.1rem;
+}
+
+.error-state {
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+}
+
+/* ── Sortie ─────────────────────────────────── */
+.sortie-mission {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+    .sortie-mission:last-child {
+        border-bottom: none;
+    }
+
+.mission-num {
+    font-family: var(--font-mono);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent-dim);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 2rem;
+}
+
+.mission-info {
+    flex: 1;
+}
+
+.mission-type {
+    font-family: var(--font-hud);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.mission-node {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-top: 1px;
+}
+
+.modifier-tag {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.5rem;
+    background: rgba(216, 64, 64, 0.1);
+    border: 1px solid rgba(216, 64, 64, 0.3);
+    color: #e88080;
+    border-radius: 2px;
+}
+
+/* ── Void Trader ────────────────────────────── */
+.trader-location {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-hud);
+    font-size: 0.85rem;
+    color: var(--gold);
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.trader-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.trader-item {
+    padding: 0.5rem 0.65rem;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+}
+
+.item-name {
+    font-family: var(--font-hud);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.item-costs {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.cost {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: 2px;
+}
+
+    .cost.ducats {
+        background: rgba(200, 168, 75, 0.12);
+        color: var(--gold);
+        border: 1px solid var(--gold-dim);
+    }
+
+    .cost.credits {
+        background: rgba(58, 159, 216, 0.08);
+        color: var(--accent);
+        border: 1px solid var(--accent-dim);
+    }
+
+.trader-absent {
+    padding: 1rem 0;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: italic;
+}
+
+/* ── Nightwave ──────────────────────────────── */
+.challenge-group {
+    margin-bottom: 0.85rem;
+}
+
+    .challenge-group:last-child {
+        margin-bottom: 0;
+    }
+
+.challenge-group-header {
+    font-family: var(--font-hud);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    padding: 0.3rem 0.5rem;
+    margin-bottom: 0.4rem;
+    border-radius: 1px;
+}
+
+    .challenge-group-header.daily {
+        background: rgba(58,159,216,0.1);
+        color: var(--accent);
+        border-left: 2px solid var(--accent);
+    }
+
+    .challenge-group-header.weekly {
+        background: rgba(200,168,75,0.1);
+        color: var(--gold);
+        border-left: 2px solid var(--gold);
+    }
+
+    .challenge-group-header.elite {
+        background: rgba(154,80,216,0.1);
+        color: var(--purple);
+        border-left: 2px solid var(--purple);
+    }
+
+.challenge-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 0.45rem 0.5rem;
+    border-bottom: 1px solid rgba(26,48,80,0.4);
+}
+
+    .challenge-row.elite {
+        background: rgba(154,80,216,0.04);
+    }
+
+    .challenge-row:last-child {
+        border-bottom: none;
+    }
+
+.challenge-title {
+    font-family: var(--font-hud);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.challenge-desc {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-top: 1px;
+}
+
+.challenge-rep {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--gold);
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+    padding-top: 2px;
+}
+
+/* ── Fissures ───────────────────────────────── */
+.fissure-row {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(26,48,80,0.4);
+}
+
+    .fissure-row:last-child {
+        border-bottom: none;
+    }
+
+.tier-badge {
+    font-family: var(--font-hud);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 0.2rem 0.4rem;
+    border-radius: 2px;
+    display: inline-block;
+}
+
+    .tier-badge.lith {
+        background: rgba(150,120,60,0.2);
+        color: #d4a84a;
+        border: 1px solid rgba(150,120,60,0.4);
+    }
+
+    .tier-badge.meso {
+        background: rgba(60,120,60,0.2);
+        color: #50c850;
+        border: 1px solid rgba(60,120,60,0.4);
+    }
+
+    .tier-badge.neo {
+        background: rgba(58,130,216,0.2);
+        color: #5ab0e8;
+        border: 1px solid rgba(58,130,216,0.4);
+    }
+
+    .tier-badge.axi {
+        background: rgba(180,80,80,0.2);
+        color: #e87070;
+        border: 1px solid rgba(180,80,80,0.4);
+    }
+
+    .tier-badge.requiem {
+        background: rgba(130,60,200,0.2);
+        color: #b060e8;
+        border: 1px solid rgba(130,60,200,0.4);
+    }
+
+    .tier-badge.omnia {
+        background: rgba(200,160,80,0.2);
+        color: #f0c84a;
+        border: 1px solid rgba(200,160,80,0.4);
+    }
+
+.fissure-mission {
+    font-family: var(--font-hud);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.fissure-node {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--text-dim);
+}
+
+.fissure-time {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--accent);
+    white-space: nowrap;
+}
+
+/* ── Daily Deals ────────────────────────────── */
+.deal-card {
+    padding: 0.75rem;
+    background: rgba(200,168,75,0.04);
+    border: 1px solid var(--gold-dim);
+    border-radius: 2px;
+    margin-bottom: 0.5rem;
+}
+
+    .deal-card:last-child {
+        margin-bottom: 0;
+    }
+
+.deal-item-name {
+    font-family: var(--font-hud);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.4rem;
+}
+
+.deal-pricing {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.deal-original {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-decoration: line-through;
+}
+
+.deal-arrow {
+    color: var(--text-muted);
+}
+
+.deal-sale {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.deal-discount {
+    font-family: var(--font-hud);
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: rgba(64,216,128,0.12);
+    color: var(--green);
+    padding: 0.1rem 0.35rem;
+    border-radius: 2px;
+    border: 1px solid rgba(64,216,128,0.3);
+}
+
+.deal-stock {
+    margin-bottom: 0.4rem;
+}
+
+.stock-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px;
+    margin-bottom: 0.25rem;
+    overflow: hidden;
+}
+
+.stock-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+    border-radius: 2px;
+}
+
+.stock-label {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--text-dim);
+}
+
+.deal-timer {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--accent);
+}
+
+/* ── Invasions ──────────────────────────────── */
+.invasion-row {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(26,48,80,0.4);
+}
+
+    .invasion-row:last-child {
+        border-bottom: none;
+    }
+
+.invasion-node {
+    font-family: var(--font-hud);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.invasion-factions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-hud);
+    font-size: 0.7rem;
+    margin-bottom: 0.35rem;
+}
+
+.faction {
+    padding: 0.15rem 0.4rem;
+    border-radius: 2px;
+    font-weight: 700;
+}
+
+.attacker {
+    background: rgba(216,64,64,0.12);
+    color: #e88080;
+    border: 1px solid rgba(216,64,64,0.25);
+}
+
+.defender {
+    background: rgba(58,159,216,0.12);
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+}
+
+.vs {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+}
+
+.invasion-progress {
+    margin-bottom: 0.3rem;
+}
+
+.progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 1px;
+    margin-bottom: 0.2rem;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red), var(--accent));
+    border-radius: 1px;
+}
+
+.progress-pct {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--text-dim);
+}
+
+.invasion-rewards {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+}
+
+.reward {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 2px;
+}
+
+.atk-reward {
+    background: rgba(216,64,64,0.08);
+    color: #e88080;
+    border: 1px solid rgba(216,64,64,0.2);
+}
+
+.def-reward {
+    background: rgba(58,159,216,0.08);
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+}
+
+/* ── Countdown ──────────────────────────────── */
+.countdown {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+    .countdown.urgent {
+        color: var(--red) !important;
+        animation: urgent-pulse 1s ease-in-out infinite;
+    }
+
+@keyframes urgent-pulse {
+    0%,100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* ── Footer ─────────────────────────────────── */
+.site-footer {
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.4);
+    position: relative;
+    z-index: 1;
+}
+
+.footer-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+}
+
+    .footer-inner a {
+        color: var(--accent);
+        text-decoration: none;
+    }
+
+        .footer-inner a:hover {
+            text-decoration: underline;
+        }
+
+.footer-sep {
+    color: var(--border);
+}

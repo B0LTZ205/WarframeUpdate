@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Warframe Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/Content/site.css" />
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div class="noise-overlay"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="logo-block">
+                <div class="logo-emblem">⬡</div>
+                <div class="logo-text">
+                    <span class="logo-main">WARFRAME</span>
+                    <span class="logo-sub">MISSION TRACKER</span>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a href="#sortie" class="nav-link">SORTIE</a>
+                <a href="#nightwave" class="nav-link">NIGHTWAVE</a>
+                <a href="#fissures" class="nav-link">FISSURES</a>
+                <a href="#voidtrader" class="nav-link">BARO</a>
+                <a href="#invasions" class="nav-link">INVASIONS</a>
+            </nav>
+            <div class="header-status">
+                <span class="status-dot"></span>
+                <span class="status-text">LOTUS ONLINE</span>
+            </div>
+        </div>
+        <div class="header-bar"></div>
+    </header>
+
+    <main class="site-main">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <span>Data provided by <a href="https://warframestat.us" target="_blank">warframestat.us</a></span>
+            <span class="footer-sep">◆</span>
+            <span>Not affiliated with Digital Extremes</span>
+            <span class="footer-sep">◆</span>
+            <span>Updated: <span id="update-time">--</span></span>
+        </div>
+    </footer>
+
+    <script src="~/Scripts/site.js"></script>
+</body>
+</html>

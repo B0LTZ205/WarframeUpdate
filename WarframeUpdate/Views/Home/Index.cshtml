@@ -1,0 +1,373 @@
+﻿@model WarframeTracker.Models.DashboardViewModel
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<!-- World State Bar -->
+<div class="world-state-bar">
+    @if (Model.CetusCycle != null)
+    {
+        var cetusState = Model.CetusCycle.IsDay ? "DAY" : "NIGHT";
+        <div class="cycle-pill @(Model.CetusCycle.IsDay ? "day" : "night")">
+            <span class="cycle-icon">@(Model.CetusCycle.IsDay ? "☀" : "☽")</span>
+            <span class="cycle-label">CETUS</span>
+            <span class="cycle-state">@cetusState</span>
+            <span class="cycle-timer" data-expiry="@Model.CetusCycle.Expiry">--</span>
+        </div>
+    }
+    @if (Model.VallisCycle != null)
+    {
+        var vallisState = Model.VallisCycle.IsWarm ? "WARM" : "COLD";
+        <div class="cycle-pill @(Model.VallisCycle.IsWarm ? "warm" : "cold")">
+            <span class="cycle-icon">@(Model.VallisCycle.IsWarm ? "🌡" : "❄")</span>
+            <span class="cycle-label">ORBUS VALLIS</span>
+            <span class="cycle-state">@vallisState</span>
+            <span class="cycle-timer" data-expiry="@Model.VallisCycle.Expiry">--</span>
+        </div>
+    }
+    <div class="cycle-pill neutral">
+        <span class="cycle-icon">🕐</span>
+        <span class="cycle-label">SERVER TIME</span>
+        <span class="cycle-state" id="server-time">--:--:--</span>
+    </div>
+</div>
+
+<div class="dashboard">
+
+    <!-- ═══ SORTIE ═══ -->
+    <section id="sortie" class="card card--sortie">
+        <div class="card-header">
+            <div class="card-title-block">
+                <span class="card-icon">⚔</span>
+                <div>
+                    <h2 class="card-title">DAILY SORTIE</h2>
+                    @if (Model.Sortie != null)
+                    {
+                        <span class="card-subtitle">@Model.Sortie.Faction</span>
+                    }
+                </div>
+            </div>
+            @if (Model.Sortie != null)
+            {
+                <div class="card-timer">
+                    <span class="timer-label">RESETS IN</span>
+                    <span class="timer-value countdown" data-expiry="@Model.Sortie.Expiry">--:--:--</span>
+                </div>
+            }
+        </div>
+        <div class="card-body">
+            @if (Model.Sortie != null && Model.Sortie.Variants != null)
+            {
+                int num = 1;
+                foreach (var mission in Model.Sortie.Variants)
+                {
+                    <div class="sortie-mission">
+                        <div class="mission-num">0@(num++)</div>
+                        <div class="mission-info">
+                            <div class="mission-type">@mission.MissionType</div>
+                            <div class="mission-node">@mission.Node</div>
+                        </div>
+                        <div class="mission-modifier">
+                            <span class="modifier-tag">@mission.Modifier</span>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="error-state">Unable to load sortie data</div>
+            }
+        </div>
+    </section>
+
+    <!-- ═══ VOID TRADER ═══ -->
+    <section id="voidtrader" class="card card--trader">
+        <div class="card-header">
+            <div class="card-title-block">
+                <span class="card-icon">💎</span>
+                <div>
+                    <h2 class="card-title">BARO KI'TEER</h2>
+                    @if (Model.VoidTrader != null)
+                    {
+                        <span class="card-subtitle @(Model.VoidTrader.Active ? "text-active" : "text-inactive")">
+                            @(Model.VoidTrader.Active ? "CURRENTLY PRESENT" : "AWAY")
+                        </span>
+                    }
+                </div>
+            </div>
+            @if (Model.VoidTrader != null)
+            {
+                <div class="card-timer">
+                    <span class="timer-label">@(Model.VoidTrader.Active ? "LEAVES IN" : "ARRIVES IN")</span>
+                    <span class="timer-value countdown" data-expiry="@Model.VoidTrader.Expiry">--:--:--</span>
+                </div>
+            }
+        </div>
+        <div class="card-body">
+            @if (Model.VoidTrader != null)
+            {
+                <div class="trader-location">
+                    <span class="location-icon">📍</span>
+                    <span>@Model.VoidTrader.Location</span>
+                </div>
+
+                if (Model.VoidTrader.Active && Model.VoidTrader.Inventory != null && Model.VoidTrader.Inventory.Count > 0)
+                {
+                    <div class="trader-grid">
+                        @foreach (var item in Model.VoidTrader.Inventory)
+                        {
+                            <div class="trader-item">
+                                <div class="item-name">@item.Item</div>
+                                <div class="item-costs">
+                                    @if (item.Ducats > 0)
+                                    {
+                                        <span class="cost ducats">@item.Ducats ◈</span>
+                                    }
+                                    @if (item.Credits > 0)
+                                    {
+                                        <span class="cost credits">@item.Credits CR</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (!Model.VoidTrader.Active)
+                {
+                    <div class="trader-absent">
+                        <p>Baro Ki'Teer is currently traveling. Check back when he arrives.</p>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="error-state">Unable to load Void Trader data</div>
+            }
+        </div>
+    </section>
+
+    <!-- ═══ NIGHTWAVE ═══ -->
+    <section id="nightwave" class="card card--nightwave">
+        <div class="card-header">
+            <div class="card-title-block">
+                <span class="card-icon">📻</span>
+                <div>
+                    <h2 class="card-title">NIGHTWAVE</h2>
+                    @if (Model.Nightwave != null)
+                    {
+                        <span class="card-subtitle">SEASON @Model.Nightwave.Season</span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (Model.Nightwave != null && Model.Nightwave.ActiveChallenges != null)
+            {
+                var daily = Model.Nightwave.ActiveChallenges.FindAll(c => c.IsDaily && !c.IsElite);
+                var weekly = Model.Nightwave.ActiveChallenges.FindAll(c => !c.IsDaily && !c.IsElite);
+                var elite = Model.Nightwave.ActiveChallenges.FindAll(c => c.IsElite);
+
+                if (daily.Count > 0)
+                {
+                    <div class="challenge-group">
+                        <div class="challenge-group-header daily">DAILY CHALLENGES</div>
+                        @foreach (var ch in daily)
+                        {
+                            <div class="challenge-row">
+                                <div class="challenge-info">
+                                    <div class="challenge-title">@ch.Title</div>
+                                    <div class="challenge-desc">@ch.Desc</div>
+                                </div>
+                                <div class="challenge-rep">@ch.Reputation REP</div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                if (weekly.Count > 0)
+                {
+                    <div class="challenge-group">
+                        <div class="challenge-group-header weekly">WEEKLY CHALLENGES</div>
+                        @foreach (var ch in weekly)
+                        {
+                            <div class="challenge-row">
+                                <div class="challenge-info">
+                                    <div class="challenge-title">@ch.Title</div>
+                                    <div class="challenge-desc">@ch.Desc</div>
+                                </div>
+                                <div class="challenge-rep">@ch.Reputation REP</div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                if (elite.Count > 0)
+                {
+                    <div class="challenge-group">
+                        <div class="challenge-group-header elite">ELITE WEEKLY</div>
+                        @foreach (var ch in elite)
+                        {
+                            <div class="challenge-row elite">
+                                <div class="challenge-info">
+                                    <div class="challenge-title">@ch.Title</div>
+                                    <div class="challenge-desc">@ch.Desc</div>
+                                </div>
+                                <div class="challenge-rep">@ch.Reputation REP</div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="error-state">Unable to load Nightwave data</div>
+            }
+        </div>
+    </section>
+
+    <!-- ═══ VOID FISSURES ═══ -->
+    <section id="fissures" class="card card--fissures">
+        <div class="card-header">
+            <div class="card-title-block">
+                <span class="card-icon">◈</span>
+                <div>
+                    <h2 class="card-title">VOID FISSURES</h2>
+                    <span class="card-subtitle">ACTIVE TEARS</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (Model.Fissures != null && Model.Fissures.Count > 0)
+            {
+                var active = Model.Fissures.FindAll(f => f.Active);
+                active.Sort((a, b) => a.TierNum.CompareTo(b.TierNum));
+                foreach (var fissure in active)
+                {
+                    var tierClass = (fissure.Tier ?? "lith").ToLower();
+                    <div class="fissure-row">
+                        <div class="fissure-tier">
+                            <span class="tier-badge @tierClass">@((fissure.Tier ?? "LITH").ToUpper())</span>
+                        </div>
+                        <div class="fissure-info">
+                            <div class="fissure-mission">@fissure.MissionType</div>
+                            <div class="fissure-node">@fissure.Node</div>
+                        </div>
+                        <div class="fissure-time">
+                            <span class="countdown" data-expiry="@fissure.Expiry">--:--</span>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="error-state">Unable to load fissure data</div>
+            }
+        </div>
+    </section>
+
+    <!-- ═══ DAILY DEALS ═══ -->
+    <section id="deals" class="card card--deals">
+        <div class="card-header">
+            <div class="card-title-block">
+                <span class="card-icon">🏪</span>
+                <div>
+                    <h2 class="card-title">DARVO DEALS</h2>
+                    <span class="card-subtitle">DAILY OFFER</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (Model.DailyDeals != null && Model.DailyDeals.Count > 0)
+            {
+                foreach (var deal in Model.DailyDeals)
+                {
+                    var pct = deal.Total > 0 ? (double)deal.Sold / deal.Total * 100 : 0;
+                    <div class="deal-card">
+                        <div class="deal-item-name">@deal.Item</div>
+                        <div class="deal-pricing">
+                            <span class="deal-original">@deal.OriginalPrice P</span>
+                            <span class="deal-arrow">→</span>
+                            <span class="deal-sale">@deal.SalePrice P</span>
+                            <span class="deal-discount">-@deal.Discount%</span>
+                        </div>
+                        @if (deal.Total > 0)
+                        {
+                            <div class="deal-stock">
+                                <div class="stock-bar">
+                                    <div class="stock-fill" style="width: @((int)pct)%"></div>
+                                </div>
+                                <span class="stock-label">@deal.Sold / @deal.Total SOLD</span>
+                            </div>
+                        }
+                        <div class="deal-timer">
+                            <span class="countdown" data-expiry="@deal.Expiry">--:--:--</span>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="error-state">No deals available</div>
+            }
+        </div>
+    </section>
+
+    <!-- ═══ INVASIONS ═══ -->
+    <section id="invasions" class="card card--invasions">
+        <div class="card-header">
+            <div class="card-title-block">
+                <span class="card-icon">⚠</span>
+                <div>
+                    <h2 class="card-title">INVASIONS</h2>
+                    <span class="card-subtitle">ACTIVE CONFLICTS</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (Model.Invasions != null && Model.Invasions.Count > 0)
+            {
+                var active = Model.Invasions.FindAll(i => !i.Completed);
+                if (active.Count == 0)
+                {
+                    <div class="error-state">No active invasions</div>
+                }
+                foreach (var invasion in active)
+                {
+                    var absPct = (int)Math.Abs(invasion.Completion);
+                    <div class="invasion-row">
+                        <div class="invasion-node">@invasion.Node</div>
+                        <div class="invasion-factions">
+                            <span class="faction attacker">@(invasion.AttackingFaction ?? "?")</span>
+                            <span class="vs">VS</span>
+                            <span class="faction defender">@(invasion.DefendingFaction ?? "?")</span>
+                        </div>
+                        <div class="invasion-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: @absPct%"></div>
+                            </div>
+                            <span class="progress-pct">@(Math.Round(invasion.Completion, 1))%</span>
+                        </div>
+                        @if (invasion.AttackerReward != null || invasion.DefenderReward != null)
+                        {
+                            <div class="invasion-rewards">
+                                @if (invasion.AttackerReward != null && !string.IsNullOrEmpty(invasion.AttackerReward.AsString))
+                                {
+                                    <span class="reward atk-reward">⚔ @invasion.AttackerReward.AsString</span>
+                                }
+                                @if (invasion.DefenderReward != null && !string.IsNullOrEmpty(invasion.DefenderReward.AsString))
+                                {
+                                    <span class="reward def-reward">🛡 @invasion.DefenderReward.AsString</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="error-state">Unable to load invasions</div>
+            }
+        </div>
+    </section>
+
+</div>
