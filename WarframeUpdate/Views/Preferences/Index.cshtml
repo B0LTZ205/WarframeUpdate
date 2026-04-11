@@ -1,0 +1,122 @@
+﻿@model List<WarframeUpdate.Models.EventSubscription>
+@{
+    ViewBag.Title = "Notification Preferences";
+}
+
+<div class="preferences-container">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card preferences-card">
+                    <div class="card-header preferences-header">
+                        <div class="text-center">
+                            <h2 class="preferences-title">📧 NOTIFICATION SETTINGS</h2>
+                            <p class="preferences-subtitle">Choose what updates you want to receive</p>
+                        </div>
+                    </div>
+
+                    <div class="card-body preferences-body">
+                        <div class="subscriptions-grid">
+                            @foreach (var subscription in Model.OrderBy(s => s.EventType))
+                            {
+                                var icon = GetIconForEvent(subscription.EventType);
+                                var description = GetDescriptionForEvent(subscription.EventType);
+                                
+                                <div class="subscription-card">
+                                    <div class="subscription-header">
+                                        <span class="subscription-icon">@Html.Raw(icon)</span>
+                                        <h4 class="subscription-title">@subscription.EventType</h4>
+                                    </div>
+                                    <p class="subscription-desc">@description</p>
+                                    <div class="subscription-toggle">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" 
+                                                   class="toggle-checkbox" 
+                                                   data-event-type="@subscription.EventType"
+                                                   @(subscription.IsSubscribed ? "checked" : "") />
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                        <span class="toggle-label">
+                                            @(subscription.IsSubscribed ? "Enabled" : "Disabled")
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="preferences-info">
+                            <p>📬 You will receive email notifications for enabled events when they update.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.toggle-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', async function () {
+                    const eventType = this.dataset.eventType;
+                    const label = this.closest('.subscription-toggle').querySelector('.toggle-label');
+                    
+                    try {
+                        const response = await fetch('@Url.Action("ToggleSubscription", "Preferences")', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: `eventType=${encodeURIComponent(eventType)}&__RequestVerificationToken=${document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''}`
+                        });
+
+                        const result = await response.json();
+                        if (result.success) {
+                            label.textContent = result.isSubscribed ? 'Enabled' : 'Disabled';
+                            console.log(`${eventType}: ${result.isSubscribed ? 'enabled' : 'disabled'}`);
+                        }
+                    } catch (error) {
+                        console.error('Error toggling subscription:', error);
+                        this.checked = !this.checked;
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+@functions {
+    private string GetIconForEvent(string eventType)
+    {
+        return eventType switch
+        {
+            "Sortie" => "⚔",
+            "Nightwave" => "📻",
+            "VoidFissures" => "◈",
+            "BaroKiTeer" => "💎",
+            "DailyDeals" => "🏪",
+            "Invasions" => "🎯",
+            "CetusCycle" => "☀",
+            "VallisCycle" => "❄",
+            _ => "📌"
+        };
+    }
+
+    private string GetDescriptionForEvent(string eventType)
+    {
+        return eventType switch
+        {
+            "Sortie" => "Get notified when a new Daily Sortie mission is available",
+            "Nightwave" => "Get notified when new Nightwave challenges appear",
+            "VoidFissures" => "Get notified when Void Fissures are available",
+            "BaroKiTeer" => "Get notified when Baro Ki'Teer arrives or leaves",
+            "DailyDeals" => "Get notified about Darvo's daily deals",
+            "Invasions" => "Get notified about active invasions",
+            "CetusCycle" => "Get notified about Cetus day/night cycles",
+            "VallisCycle" => "Get notified about Vallis warm/cold cycles",
+            _ => "Receive notifications for this event"
+        };
+    }
+}

@@ -27,30 +27,38 @@ namespace WarframeTracker.Services
 
         public async Task<DashboardViewModel> GetDashboardAsync()
         {
-            var tasks = new Task[]
-            {
-                FetchAsync<SortieModel>("pc/sortie", TimeSpan.FromMinutes(10)),
-                FetchAsync<NightwaveModel>("pc/nightwave", TimeSpan.FromMinutes(10)),
-                FetchAsync<List<FissureModel>>("pc/fissures", TimeSpan.FromMinutes(5)),
-                FetchAsync<VoidTraderModel>("pc/voidTrader", TimeSpan.FromMinutes(30)),
-                FetchAsync<List<DailyDealModel>>("pc/dailyDeals", TimeSpan.FromMinutes(10)),
-                FetchAsync<List<InvasionModel>>("pc/invasions", TimeSpan.FromMinutes(5)),
-                FetchAsync<CetusCycleModel>("pc/cetusCycle", TimeSpan.FromMinutes(2)),
-                FetchAsync<VallisCycleModel>("pc/vallisCycle", TimeSpan.FromMinutes(2))
-            };
+            var sortieTask = FetchAsync<SortieModel>("pc/sortie", TimeSpan.FromMinutes(10));
+            var nightwaveTask = FetchAsync<NightwaveModel>("pc/nightwave", TimeSpan.FromMinutes(10));
+            var fissuresTask = FetchAsync<List<FissureModel>>("pc/fissures", TimeSpan.FromMinutes(5));
+            var voidTraderTask = FetchAsync<VoidTraderModel>("pc/voidTrader", TimeSpan.FromMinutes(30));
+            var dailyDealsTask = FetchAsync<List<DailyDealModel>>("pc/dailyDeals", TimeSpan.FromMinutes(10));
+            var invasionsTask = FetchAsync<List<InvasionModel>>("pc/invasions", TimeSpan.FromMinutes(5));
+            var cetusCycleTask = FetchAsync<CetusCycleModel>("pc/cetusCycle", TimeSpan.FromMinutes(2));
+            var vallisCycleTask = FetchAsync<VallisCycleModel>("pc/vallisCycle", TimeSpan.FromMinutes(2));
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(sortieTask, nightwaveTask, fissuresTask, voidTraderTask, dailyDealsTask, invasionsTask, cetusCycleTask, vallisCycleTask);
+
+            var sortie = await sortieTask;
+            var nightwave = await nightwaveTask;
+            var fissures = await fissuresTask ?? new List<FissureModel>();
+            var voidTrader = await voidTraderTask;
+            var dailyDeals = await dailyDealsTask ?? new List<DailyDealModel>();
+            var invasions = await invasionsTask ?? new List<InvasionModel>();
+            var cetusCycle = await cetusCycleTask;
+            var vallisCycle = await vallisCycleTask;
+
+            System.Diagnostics.Debug.WriteLine($"[WarframeService] Dashboard loaded - Fissures count: {fissures?.Count ?? 0}");
 
             return new DashboardViewModel
             {
-                Sortie      = ((Task<SortieModel>)tasks[0]).Result,
-                Nightwave   = ((Task<NightwaveModel>)tasks[1]).Result,
-                Fissures    = ((Task<List<FissureModel>>)tasks[2]).Result,
-                VoidTrader  = ((Task<VoidTraderModel>)tasks[3]).Result,
-                DailyDeals  = ((Task<List<DailyDealModel>>)tasks[4]).Result,
-                Invasions   = ((Task<List<InvasionModel>>)tasks[5]).Result,
-                CetusCycle  = ((Task<CetusCycleModel>)tasks[6]).Result,
-                VallisCycle = ((Task<VallisCycleModel>)tasks[7]).Result,
+                Sortie = sortie,
+                Nightwave = nightwave,
+                Fissures = fissures,
+                VoidTrader = voidTrader,
+                DailyDeals = dailyDeals,
+                Invasions = invasions,
+                CetusCycle = cetusCycle,
+                VallisCycle = vallisCycle,
             };
         }
 
@@ -59,22 +67,41 @@ namespace WarframeTracker.Services
             lock (_cache)
             {
                 if (_cache.TryGetValue(endpoint, out var cached) && cached.Expiry > DateTime.UtcNow)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[WarframeService] Returning cached data for {endpoint}");
                     return (T)cached.Data;
+                }
             }
 
             try
             {
-                var json = await _client.GetStringAsync($"{endpoint}?language=en");
+                var url = $"{endpoint}?language=en";
+                System.Diagnostics.Debug.WriteLine($"[WarframeService] Fetching {url}");
+                
+                var json = await _client.GetStringAsync(url);
                 var data = JsonConvert.DeserializeObject<T>(json);
+                
                 lock (_cache)
                 {
                     _cache[endpoint] = (data, DateTime.UtcNow.Add(cacheDuration));
                 }
+                
+                System.Diagnostics.Debug.WriteLine($"[WarframeService] Successfully fetched {endpoint} - Data: {(data?.ToString() ?? "null")}");
                 return data;
+            }
+            catch (HttpRequestException httpEx)
+            {
+                System.Diagnostics.Debug.WriteLine($"[WarframeService] HTTP Error fetching {endpoint}: {httpEx.Message}");
+                return null;
+            }
+            catch (JsonSerializationException jsonEx)
+            {
+                System.Diagnostics.Debug.WriteLine($"[WarframeService] JSON Parse Error for {endpoint}: {jsonEx.Message}");
+                return null;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[WarframeService] Failed to fetch {endpoint}: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[WarframeService] Failed to fetch {endpoint}: {ex.GetType().Name} - {ex.Message}");
                 return null;
             }
         }

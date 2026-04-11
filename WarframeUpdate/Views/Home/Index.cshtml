@@ -237,25 +237,46 @@
             </div>
         </div>
         <div class="card-body">
-            @if (Model.Fissures != null && Model.Fissures.Count > 0)
+            @if (Model != null && Model.Fissures != null && Model.Fissures.Count > 0)
             {
-                var active = Model.Fissures.FindAll(f => f.Active);
-                active.Sort((a, b) => a.TierNum.CompareTo(b.TierNum));
-                foreach (var fissure in active)
+                // Show all fissures, not just active ones
+                var fissuresToShow = Model.Fissures.OrderBy(f => f.TierNum).ToList();
+                var itemsToShowInitially = 5;
+                
+                if (fissuresToShow != null && fissuresToShow.Count > 0)
                 {
-                    var tierClass = (fissure.Tier ?? "lith").ToLower();
-                    <div class="fissure-row">
-                        <div class="fissure-tier">
-                            <span class="tier-badge @tierClass">@((fissure.Tier ?? "LITH").ToUpper())</span>
-                        </div>
-                        <div class="fissure-info">
-                            <div class="fissure-mission">@fissure.MissionType</div>
-                            <div class="fissure-node">@fissure.Node</div>
-                        </div>
-                        <div class="fissure-time">
-                            <span class="countdown" data-expiry="@fissure.Expiry">--:--</span>
-                        </div>
+                    <div class="fissures-container">
+                        @for (int i = 0; i < fissuresToShow.Count; i++)
+                        {
+                            var fissure = fissuresToShow[i];
+                            var tierClass = (fissure.Tier ?? "lith").ToLower();
+                            var hiddenClass = i >= itemsToShowInitially ? "fissure-hidden" : "";
+                            
+                            <div class="fissure-row @hiddenClass">
+                                <div class="fissure-tier">
+                                    <span class="tier-badge @tierClass">@((fissure.Tier ?? "LITH").ToUpper())</span>
+                                </div>
+                                <div class="fissure-info">
+                                    <div class="fissure-mission">@fissure.MissionType</div>
+                                    <div class="fissure-node">@fissure.Node</div>
+                                </div>
+                                <div class="fissure-time">
+                                    <span class="countdown" data-expiry="@fissure.Expiry">--:--</span>
+                                </div>
+                            </div>
+                        }
                     </div>
+                    
+                    if (fissuresToShow.Count > itemsToShowInitially)
+                    {
+                        <button type="button" class="btn-show-more" id="fissureShowMore" data-total="@fissuresToShow.Count" data-shown="@itemsToShowInitially" onclick="return false;">
+                            SHOW MORE (@(fissuresToShow.Count - itemsToShowInitially) MORE)
+                        </button>
+                    }
+                }
+                else
+                {
+                    <div class="error-state">No fissures available</div>
                 }
             }
             else
@@ -371,3 +392,4 @@
     </section>
 
 </div>
+

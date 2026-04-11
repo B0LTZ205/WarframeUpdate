@@ -3,40 +3,67 @@
     ViewBag.Title = "Register";
 }
 
-<main aria-labelledby="title">
-    <h2 id="title">@ViewBag.Title.</h2>
+<div class="auth-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-6 col-sm-8">
+                <div class="card auth-card">
+                    <div class="card-header auth-card-header">
+                        <div class="text-center">
+                            <div class="auth-icon">⬡</div>
+                            <h2 class="auth-title">NEW TENNO</h2>
+                            <p class="auth-subtitle">INITIALIZE ACCOUNT</p>
+                        </div>
+                    </div>
 
-    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
-    {
-        @Html.AntiForgeryToken()
-        <h4>Create a new account.</h4>
-        <hr />
-        @Html.ValidationSummary("", new { @class = "text-danger" })
-        <div class="row">
-            @Html.LabelFor(m => m.Email, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    <div class="card-body auth-card-body">
+                        @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            @Html.ValidationSummary("", new { @class = "alert alert-danger alert-validation" })
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.Email, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-lg", placeholder = "your@email.com" })
+                                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "invalid-feedback" })
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.Password, new { @class = "form-label" })
+                                @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-lg", placeholder = "••••••••" })
+                                <small class="form-text text-muted d-block mt-2">
+                                    MIN 6 CHARS • 1 UPPERCASE • 1 LOWERCASE • 1 DIGIT • 1 SPECIAL CHARACTER
+                                </small>
+                                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "invalid-feedback" })
+                            </div>
+
+                            <div class="mb-4">
+                                @Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label" })
+                                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control form-control-lg", placeholder = "••••••••" })
+                                @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "invalid-feedback" })
+                            </div>
+
+                            <button type="submit" class="btn btn-accent btn-lg w-100 mb-3">CREATE ACCOUNT</button>
+
+                            <div class="d-grid gap-2">
+                                <small class="text-center">
+                                    Already registered? 
+                                    <br />
+                                    @Html.ActionLink("Sign in here", "Login", "Account", new { }, new { @class = "link-gold fw-bold" })
+                                </small>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="card-footer auth-card-footer text-center">
+                        <small>Lotus Security Protocol v1.0</small>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row">
-            @Html.LabelFor(m => m.Password, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-10">
-                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-            </div>
-        </div>
-        <div class="row">
-            @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 col-form-label" })
-            <div class="col-md-10">
-                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
-            </div>
-        </div>
-        <div class="row">
-            <div class="offset-md-2 col-md-10">
-                <input type="submit" value="Register" class="btn btn-outline-dark" />
-            </div>
-        </div>
-    }
-</main>
+    </div>
+</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

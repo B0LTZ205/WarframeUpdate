@@ -1,6 +1,6 @@
-/* ═══════════════════════════════════════════
-   WARFRAME TRACKER — CLIENT SCRIPT
-   ═══════════════════════════════════════════ */
+/*  ═══════════════════════════════════════════
+    WARFRAME TRACKER — CLIENT SCRIPT
+    ═══════════════════════════════════════════ */
 
 // ── Server Clock ──────────────────────────────────────────
 function updateServerTime() {
@@ -28,6 +28,8 @@ function formatRemaining(ms) {
 
 function tickCountdowns() {
     const now = Date.now();
+    let shouldRefresh = false;
+
     document.querySelectorAll('.countdown[data-expiry]').forEach(el => {
         const expiry = new Date(el.dataset.expiry).getTime();
         const remaining = expiry - now;
@@ -40,12 +42,77 @@ function tickCountdowns() {
             el.classList.remove('urgent');
         }
 
-        // Auto-reload page when something expires
+        // Mark for refresh when timer expires
         if (remaining <= 0 && !el.dataset.expired) {
             el.dataset.expired = '1';
-            setTimeout(() => location.reload(), 3000);
+            shouldRefresh = true;
         }
     });
+
+    // Refresh data when any timer expires
+    if (shouldRefresh) {
+        setTimeout(() => {
+            refreshDashboardData();
+        }, 1000);
+    }
+}
+
+// ── Refresh Dashboard Data (Full Page Update) ────────────
+async function refreshDashboardData() {
+    try {
+        console.log('[Dashboard] Fetching fresh data...');
+        const response = await fetch(window.location.href, {
+            method: 'GET',
+            headers: {
+                'Accept': 'text/html'
+            }
+        });
+
+        if (!response.ok) {
+            console.error('[Dashboard] HTTP error:', response.status);
+            return;
+        }
+
+        const html = await response.text();
+        
+        // Parse the new HTML
+        const parser = new DOMParser();
+        const newDoc = parser.parseFromString(html, 'text/html');
+        
+        // Update dashboard content
+        const newDashboard = newDoc.querySelector('.dashboard');
+        const currentDashboard = document.querySelector('.dashboard');
+        
+        if (newDashboard && currentDashboard) {
+            currentDashboard.innerHTML = newDashboard.innerHTML;
+            console.log('[Dashboard] Dashboard updated');
+            
+            // Reset expired flags on all countdowns
+            document.querySelectorAll('.countdown[data-expiry]').forEach(el => {
+                el.dataset.expired = '0';
+            });
+            
+            // Update world state bar if it exists
+            const newWorldState = newDoc.querySelector('.world-state-bar');
+            const currentWorldState = document.querySelector('.world-state-bar');
+            if (newWorldState && currentWorldState) {
+                currentWorldState.innerHTML = newWorldState.innerHTML;
+                console.log('[Dashboard] World state bar updated');
+            }
+            
+            // Re-init animations on new cards
+            initAnimations();
+            initFissureShowMore();
+            
+            // Trigger immediate countdown update
+            tickCountdowns();
+            tickCycleTimers();
+            
+            console.log('[Dashboard] UI fully updated');
+        }
+    } catch (error) {
+        console.error('[Dashboard] Refresh failed:', error);
+    }
 }
 
 // ── Cycle Timers ─────────────────────────────────────────
@@ -107,14 +174,48 @@ function initNavHighlight() {
     sections.forEach(s => observer.observe(s));
 }
 
-// ── Auto Refresh (every 5 min) ───────────────────────────
-function initAutoRefresh() {
-    setTimeout(() => {
-        // Only reload if page is visible to avoid waking sleeping tabs
-        if (!document.hidden) {
-            location.reload();
-        }
-    }, 5 * 60 * 1000);
+// ── Show More/Less for Fissures ──────────────────────────
+function initFissureShowMore() {
+    const showMoreBtn = document.getElementById('fissureShowMore');
+    
+    if (showMoreBtn) {
+        showMoreBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const container = document.querySelector('.fissures-container');
+            
+            if (!container) {
+                console.error('Fissures container not found');
+                return;
+            }
+            
+            const hiddenRows = container.querySelectorAll('.fissure-hidden');
+            
+            if (hiddenRows.length > 0) {
+                // Show all hidden rows
+                hiddenRows.forEach(row => row.classList.remove('fissure-hidden'));
+                showMoreBtn.textContent = 'SHOW LESS';
+                showMoreBtn.classList.add('collapsed');
+                showMoreBtn.dataset.expanded = 'true';
+            } else {
+                // Hide rows again (show only first 5)
+                const itemsToShowInitially = 5;
+                const allRows = container.querySelectorAll('.fissure-row');
+                
+                allRows.forEach((row, index) => {
+                    if (index >= itemsToShowInitially) {
+                        row.classList.add('fissure-hidden');
+                    }
+                });
+                
+                const hiddenCount = allRows.length - itemsToShowInitially;
+                showMoreBtn.textContent = `SHOW MORE (${hiddenCount} MORE)`;
+                showMoreBtn.classList.remove('collapsed');
+                showMoreBtn.dataset.expanded = 'false';
+            }
+        });
+    }
 }
 
 // ── Init ─────────────────────────────────────────────────
@@ -126,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setUpdateTime();
     initAnimations();
     initNavHighlight();
-    initAutoRefresh();
+    initFissureShowMore();
 
     // Tick every second
     setInterval(() => {
