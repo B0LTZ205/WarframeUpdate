@@ -1,89 +1,115 @@
-﻿@model WarframeUpdate.Models.IndexViewModel
+﻿@model ManageProfileViewModel
+
 @{
-    ViewBag.Title = "Manage";
+    ViewBag.Title = "My Account Settings";
 }
 
-<main aria-labelledby="title">
-    <h2 id="title">@ViewBag.Title.</h2>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h2 class="mb-4">⚙️ Account Settings</h2>
 
-    <p class="text-success">@ViewBag.StatusMessage</p>
-    <div>
-        <h4>Change your account settings</h4>
-        <hr />
-        <dl class="dl-horizontal">
-            <dt>Password:</dt>
-            <dd>
-                [
-                @if (Model.HasPassword)
-                {
-                    @Html.ActionLink("Change your password", "ChangePassword")
-                }
-                else
-                {
-                    @Html.ActionLink("Create", "SetPassword")
-                }
-                ]
-            </dd>
-            <dt>External Logins:</dt>
-            <dd>
-                @Model.Logins.Count [
-                @Html.ActionLink("Manage", "ManageLogins") ]
-            </dd>
-            @*
-                Phone Numbers can used as a second factor of verification in a two-factor authentication system.
-                
-                See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
-                    for details on setting up this ASP.NET application to support two-factor authentication using SMS.
-                
-                Uncomment the following block after you have set up two-factor authentication
-            *@
-            @*  
-                <dt>Phone Number:</dt>
-                <dd>
-                    @(Model.PhoneNumber ?? "None")
-                    @if (Model.PhoneNumber != null)
-                    {
-                        <br />
-                        <text>[&nbsp;&nbsp;@Html.ActionLink("Change", "AddPhoneNumber")&nbsp;&nbsp;]</text>
-                        using (Html.BeginForm("RemovePhoneNumber", "Manage", FormMethod.Post, new { role = "form" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            <text>[<input type="submit" value="Remove" class="btn-link" />]</text>
-                        }
-                    }
-                    else
-                    {
-                        <text>[&nbsp;&nbsp;@Html.ActionLink("Add", "AddPhoneNumber")
-                    }
-                </dd>
-            *@
-            <dt>Two-Factor Authentication:</dt>
-            <dd>
-                <p>
-                    There are no two-factor authentication providers configured. See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
-                    for details on setting up this ASP.NET application to support two-factor authentication.
-                </p>
-                @*@if (Model.TwoFactor)
-                    {
-                        using (Html.BeginForm("DisableTwoFactorAuthentication", "Manage", FormMethod.Post, new { role = "form" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            <text>Enabled
-                            <input type="submit" value="Disable" class="btn btn-link" />
-                            </text>
-                        }
-                    }
-                    else
-                    {
-                        using (Html.BeginForm("EnableTwoFactorAuthentication", "Manage", FormMethod.Post, new { role = "form" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            <text>Disabled
-                            <input type="submit" value="Enable" class="btn btn-link" />
-                            </text>
-                        }
-                    }*@
-            </dd>
-        </dl>
+            @if (!string.IsNullOrEmpty(ViewBag.StatusMessage))
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @ViewBag.StatusMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Profile Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">👤 Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Profile Picture -->
+                        <div class="col-md-3 text-center">
+                            <div class="profile-picture-container mb-3">
+                                @if (Model.UserProfile != null && !string.IsNullOrEmpty(Model.UserProfile.ProfilePictureUrl))
+                                {
+                                    <img src="@Model.UserProfile.ProfilePictureUrl" 
+                                         alt="Profile Picture" 
+                                         class="img-thumbnail rounded-circle" 
+                                         style="width: 150px; height: 150px; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <div class="img-thumbnail rounded-circle d-flex align-items-center justify-content-center" 
+                                         style="width: 150px; height: 150px; background-color: #e9ecef;">
+                                        <i class="fas fa-user fa-3x text-secondary"></i>
+                                    </div>
+                                }
+                            </div>
+                            <a href="@Url.Action("UpdateProfile", "Manage")" class="btn btn-sm btn-primary">
+                                <i class="fas fa-camera"></i> Upload Picture
+                            </a>
+                        </div>
+
+                        <!-- User Info -->
+                        <div class="col-md-9">
+                            <p>
+                                <strong>Email:</strong> @Model.User.Email
+                                <span class="badge @(Model.User.EmailConfirmed ? "bg-success" : "bg-warning")">
+                                    @(Model.User.EmailConfirmed ? "✓ Verified" : "Unverified")
+                                </span>
+                            </p>
+                            <p>
+                                <strong>Username:</strong> @Model.User.UserName
+                            </p>
+
+                            @if (Model.UserProfile != null)
+                            {
+                                <p>
+                                    <strong>First Name:</strong> @(Model.UserProfile.FirstName ?? "Not set")
+                                </p>
+                                <p>
+                                    <strong>Last Name:</strong> @(Model.UserProfile.LastName ?? "Not set")
+                                </p>
+                                <p>
+                                    <strong>Phone:</strong> @(Model.UserProfile.PhoneNumber ?? "Not set")
+                                </p>
+                                <p>
+                                    <strong>Member Since:</strong> @Model.UserProfile.CreatedAt.ToString("MMM dd, yyyy")
+                                </p>
+                            }
+
+                            <a href="@Url.Action("UpdateProfile", "Manage")" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">🔒 Security Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="@Url.Action("ChangePassword", "Manage")" class="list-group-item list-group-item-action">
+                            <i class="fas fa-key"></i> Change Password
+                            <span class="float-end"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preferences Section -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📧 Notification Preferences</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Manage your notification settings for Warframe events.</p>
+                    <a href="@Url.Action("Index", "Preferences")" class="btn btn-info">
+                        <i class="fas fa-cog"></i> Manage Preferences
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-</main>
+</div>

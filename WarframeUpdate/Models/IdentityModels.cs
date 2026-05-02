@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -13,6 +14,9 @@ namespace WarframeUpdate.Models
     public class ApplicationUser : IdentityUser
     {
         public virtual ICollection<EventSubscription> EventSubscriptions { get; set; }
+        public virtual ICollection<FileUpload> FileUploads { get; set; }
+        public virtual ICollection<AdminActivityLog> AdminActivityLogs { get; set; }
+        public virtual UserProfile UserProfile { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
@@ -31,6 +35,41 @@ namespace WarframeUpdate.Models
         }
 
         public DbSet<EventSubscription> EventSubscriptions { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<FileUpload> FileUploads { get; set; }
+        public DbSet<AdminActivityLog> AdminActivityLogs { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Configure UserProfile to ApplicationUser relationship (one-to-one)
+            // UserId is the primary key and foreign key
+            modelBuilder.Entity<UserProfile>()
+                .HasRequired(up => up.User)
+                .WithOptional(au => au.UserProfile);
+
+            // Configure EventSubscription to ApplicationUser relationship (one-to-many)
+            modelBuilder.Entity<EventSubscription>()
+                .HasRequired(es => es.User)
+                .WithMany(au => au.EventSubscriptions)
+                .HasForeignKey(es => es.UserId)
+                .WillCascadeOnDelete(true);
+
+            // Configure FileUpload to ApplicationUser relationship (one-to-many)
+            modelBuilder.Entity<FileUpload>()
+                .HasRequired(fu => fu.User)
+                .WithMany(au => au.FileUploads)
+                .HasForeignKey(fu => fu.UserId)
+                .WillCascadeOnDelete(true);
+
+            // Configure AdminActivityLog to ApplicationUser relationship (one-to-many)
+            modelBuilder.Entity<AdminActivityLog>()
+                .HasRequired(aal => aal.AdminUser)
+                .WithMany(au => au.AdminActivityLogs)
+                .HasForeignKey(aal => aal.AdminUserId)
+                .WillCascadeOnDelete(false);
+        }
 
         public static ApplicationDbContext Create()
         {

@@ -90,33 +90,51 @@
 @functions {
     private string GetIconForEvent(string eventType)
     {
-        return eventType switch
+        switch (eventType)
         {
-            "Sortie" => "⚔",
-            "Nightwave" => "📻",
-            "VoidFissures" => "◈",
-            "BaroKiTeer" => "💎",
-            "DailyDeals" => "🏪",
-            "Invasions" => "🎯",
-            "CetusCycle" => "☀",
-            "VallisCycle" => "❄",
-            _ => "📌"
-        };
+            case "Sortie":
+                return "⚔";
+            case "Nightwave":
+                return "📻";
+            case "VoidFissures":
+                return "◈";
+            case "BaroKiTeer":
+                return "💎";
+            case "DailyDeals":
+                return "🏪";
+            case "Invasions":
+                return "🎯";
+            case "CetusCycle":
+                return "☀";
+            case "VallisCycle":
+                return "❄";
+            default:
+                return "📌";
+        }
     }
 
     private string GetDescriptionForEvent(string eventType)
     {
-        return eventType switch
+        switch (eventType)
         {
-            "Sortie" => "Get notified when a new Daily Sortie mission is available",
-            "Nightwave" => "Get notified when new Nightwave challenges appear",
-            "VoidFissures" => "Get notified when Void Fissures are available",
-            "BaroKiTeer" => "Get notified when Baro Ki'Teer arrives or leaves",
-            "DailyDeals" => "Get notified about Darvo's daily deals",
-            "Invasions" => "Get notified about active invasions",
-            "CetusCycle" => "Get notified about Cetus day/night cycles",
-            "VallisCycle" => "Get notified about Vallis warm/cold cycles",
-            _ => "Receive notifications for this event"
-        };
+            case "Sortie":
+                return "Get notified when a new Daily Sortie mission is available";
+            case "Nightwave":
+                return "Get notified when new Nightwave challenges appear";
+            case "VoidFissures":
+                return "Get notified when Void Fissures are available";
+            case "BaroKiTeer":
+                return "Get notified when Baro Ki'Teer arrives or leaves";
+            case "DailyDeals":
+                return "Get notified about Darvo's daily deals";
+            case "Invasions":
+                return "Get notified about active invasions";
+            case "CetusCycle":
+                return "Get notified about Cetus day/night cycles";
+            case "VallisCycle":
+                return "Get notified about Vallis warm/cold cycles";
+            default:
+                return "Receive notifications for this event";
+        }
     }
 }

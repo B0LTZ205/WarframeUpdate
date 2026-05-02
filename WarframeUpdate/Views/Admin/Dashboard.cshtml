@@ -1,0 +1,112 @@
+﻿@model WarframeUpdate.Controllers.AdminDashboardViewModel
+
+@{
+    ViewBag.Title = "Admin Dashboard";
+}
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">📊 Admin Dashboard</h2>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Users</h5>
+                    <h2>@Model.TotalUsers</h2>
+                    <a href="@Url.Action("Users", "Admin")" class="btn btn-light btn-sm mt-2">View Users</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Files</h5>
+                    <h2>@Model.TotalFileUploads</h2>
+                    <small>Across all users</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Event Subscriptions</h5>
+                    <h2>@Model.TotalEventSubscriptions</h2>
+                    <small>Active subscriptions</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Activity</h5>
+                    <h2>@Model.RecentActivityLogs.Count</h2>
+                    <small>Last 10 actions</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">📋 Recent Activity Log</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentActivityLogs.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Admin</th>
+                                        <th>Action</th>
+                                        <th>Details</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var log in Model.RecentActivityLogs)
+                                    {
+                                        <tr>
+                                            <td>@log.AdminUser.UserName</td>
+                                            <td><strong>@log.Action</strong></td>
+                                            <td>@log.Details</td>
+                                            <td>@log.CreatedAt.ToString("MMM dd, HH:mm")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No recent activity.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">⚙️ Quick Actions</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="@Url.Action("Users", "Admin")" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users"></i> Manage Users
+                    </a>
+                    <a href="@Url.Action("ActivityLogs", "Admin")" class="list-group-item list-group-item-action">
+                        <i class="fas fa-history"></i> View All Logs
+                    </a>
+                    <a href="@Url.Action("Index", "Home")" class="list-group-item list-group-item-action">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

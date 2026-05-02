@@ -1,0 +1,115 @@
+﻿@{
+    ViewBag.Title = "Upload File";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">📤 Upload File</h4>
+                </div>
+
+                <div class="card-body">
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @ViewBag.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (ViewBag.SuccessMessage != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @ViewBag.SuccessMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @using (Html.BeginForm("Upload", "FileUpload", FormMethod.Post,
+                        new { enctype = "multipart/form-data", novalidate = "novalidate" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label for="file" class="form-label fw-bold">Select File:</label>
+                            <input type="file" id="file" name="HttpPostedFileBase" class="form-control" required />
+                            <small class="form-text text-muted d-block mt-2">
+                                Allowed: Images (jpg, png, gif), Videos (mp4, avi, mov), Audio (mp3, wav), Documents (pdf, doc, txt)<br />
+                                Max size: 50 MB
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-bold">Description (Optional):</label>
+                            <textarea id="description" name="description" class="form-control" rows="3"
+                                      placeholder="Add a description for this file..."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-upload"></i> Upload File
+                            </button>
+                            <a href="@Url.Action("Index", "FileUpload")" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- File Type Info -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">ℹ️ Supported File Types</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Images:</strong>
+                            <ul class="small">
+                                <li>.jpg / .jpeg</li>
+                                <li>.png</li>
+                                <li>.gif / .bmp</li>
+                            </ul>
+                        </div>
+                        <div class="col-6">
+                            <strong>Media:</strong>
+                            <ul class="small">
+                                <li>Video: .mp4, .avi, .mov</li>
+                                <li>Audio: .mp3, .wav</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <hr />
+                    <strong>Documents:</strong>
+                    <ul class="small">
+                        <li>.pdf, .doc, .docx, .txt, .xls, .xlsx</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>// Client-side file validation
+    document.getElementById('file').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const maxSize = 50 * 1024 * 1024; // 50 MB
+        const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'mp4', 'avi', 'mov', 'mkv',
+                                   'mp3', 'wav', 'flac', 'aac', 'pdf', 'doc', 'docx', 'txt', 'xls', 'xlsx'];
+
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        if (file.size > maxSize) {
+            alert('File size exceeds 50 MB limit!');
+            e.target.value = '';
+            return;
+        }
+
+        if (!allowedExtensions.includes(ext)) {
+            alert('This file type is not allowed!');
+            e.target.value = '';
+        }
+    });</script>

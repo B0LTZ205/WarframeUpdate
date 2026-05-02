@@ -1,0 +1,157 @@
+﻿@model WarframeUpdate.Controllers.AdminUserDetailsViewModel
+
+@{
+    ViewBag.Title = "User Details";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-lg-12">
+            <a href="@Url.Action("Users", "Admin")" class="btn btn-secondary mb-3">
+                <i class="fas fa-arrow-left"></i> Back to Users
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- User Info -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">👤 User Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Username:</strong> @Model.User.UserName</p>
+                    <p><strong>Email:</strong> @Model.User.Email</p>
+                    <p>
+                        <strong>Email Confirmed:</strong>
+                        <span class="badge @(Model.User.EmailConfirmed ? "bg-success" : "bg-warning")">
+                            @(Model.User.EmailConfirmed ? "Yes" : "No")
+                        </span>
+                    </p>
+
+                    @if (Model.UserProfile != null)
+                    {
+                        <hr />
+                        <p><strong>First Name:</strong> @Model.UserProfile.FirstName</p>
+                        <p><strong>Last Name:</strong> @Model.UserProfile.LastName</p>
+                        if (!string.IsNullOrEmpty(Model.UserProfile.PhoneNumber))
+                        {
+                            <p><strong>Phone:</strong> @Model.UserProfile.PhoneNumber</p>
+                        }
+                        <p><strong>Member Since:</strong> @Model.UserProfile.CreatedAt.ToString("MMM dd, yyyy")</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="col-lg-8">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4 bg-success text-white">
+                        <div class="card-body">
+                            <h6 class="card-title">Total Files Uploaded</h6>
+                            <h2>@Model.FileUploads.Count</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4 bg-info text-white">
+                        <div class="card-body">
+                            <h6 class="card-title">Event Subscriptions</h6>
+                            <h2>@Model.EventSubscriptions.Where(s => s.IsSubscribed).Count()</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Files -->
+    @if (Model.FileUploads.Any())
+    {
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">📁 Recent Files</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Type</th>
+                                <th>Size</th>
+                                <th>Uploaded</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var file in Model.FileUploads.OrderByDescending(f => f.UploadedAt).Take(10))
+                            {
+                                <tr>
+                                    <td>@file.OriginalFileName</td>
+                                    <td><span class="badge bg-info">@file.FileType</span></td>
+                                    <td>@FormatFileSize(file.FileSizeBytes)</td>
+                                    <td>@file.UploadedAt.ToString("MMM dd, yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Subscriptions -->
+    @if (Model.EventSubscriptions.Any())
+    {
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">📧 Event Subscriptions</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Event Type</th>
+                                <th>Status</th>
+                                <th>Subscribed Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var sub in Model.EventSubscriptions)
+                            {
+                                <tr>
+                                    <td>@sub.EventType</td>
+                                    <td>
+                                        <span class="badge @(sub.IsSubscribed ? "bg-success" : "bg-secondary")">
+                                            @(sub.IsSubscribed ? "Active" : "Inactive")
+                                        </span>
+                                    </td>
+                                    <td>@sub.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@functions {
+    string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
+    }
+}
