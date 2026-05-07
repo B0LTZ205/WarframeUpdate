@@ -79,6 +79,13 @@ namespace WarframeTracker.Services
                 System.Diagnostics.Debug.WriteLine($"[WarframeService] Fetching {url}");
                 
                 var json = await _client.GetStringAsync(url);
+                
+                // Debug log raw JSON for invasions
+                if (endpoint == "pc/invasions")
+                {
+                    System.Diagnostics.Debug.WriteLine($"[WarframeService] Raw invasions JSON: {json.Substring(0, Math.Min(500, json.Length))}...");
+                }
+                
                 var data = JsonConvert.DeserializeObject<T>(json);
                 
                 lock (_cache)
@@ -86,7 +93,7 @@ namespace WarframeTracker.Services
                     _cache[endpoint] = (data, DateTime.UtcNow.Add(cacheDuration));
                 }
                 
-                System.Diagnostics.Debug.WriteLine($"[WarframeService] Successfully fetched {endpoint} - Data: {(data?.ToString() ?? "null")}");
+                System.Diagnostics.Debug.WriteLine($"[WarframeService] Successfully fetched {endpoint}");
                 return data;
             }
             catch (HttpRequestException httpEx)
@@ -101,7 +108,7 @@ namespace WarframeTracker.Services
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[WarframeService] Failed to fetch {endpoint}: {ex.GetType().Name} - {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[WarframeService] Unexpected error fetching {endpoint}: {ex.Message}");
                 return null;
             }
         }

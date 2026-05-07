@@ -60,6 +60,10 @@ namespace WarframeTracker.Models
 
         [JsonProperty("expiry")]
         public string Expiry { get; set; }
+
+        // Add a unique ID for tracking (this can be generated from title + expiry)
+        [JsonIgnore]
+        public string ChallengeId => $"{Title}_{Expiry}".GetHashCode().ToString();
     }
 
     // ── Void Fissures ──────────────────────────────────────
@@ -146,14 +150,17 @@ namespace WarframeTracker.Models
     // ── Invasions ──────────────────────────────────────────
     public class InvasionModel
     {
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
         [JsonProperty("node")]
         public string Node { get; set; }
 
-        [JsonProperty("attackingFaction")]
-        public string AttackingFaction { get; set; }
+        [JsonProperty("nodeKey")]
+        public string NodeKey { get; set; }
 
-        [JsonProperty("defendingFaction")]
-        public string DefendingFaction { get; set; }
+        [JsonProperty("desc")]
+        public string Description { get; set; }
 
         [JsonProperty("completion")]
         public double Completion { get; set; }
@@ -161,17 +168,82 @@ namespace WarframeTracker.Models
         [JsonProperty("completed")]
         public bool Completed { get; set; }
 
-        [JsonProperty("attackerReward")]
-        public InvasionReward AttackerReward { get; set; }
+        [JsonProperty("attacker")]
+        public InvasionSide Attacker { get; set; }
 
-        [JsonProperty("defenderReward")]
-        public InvasionReward DefenderReward { get; set; }
+        [JsonProperty("defender")]
+        public InvasionSide Defender { get; set; }
+
+        // Legacy properties for compatibility
+        [JsonIgnore]
+        public string AttackingFaction => Attacker?.Faction ?? "Unknown";
+
+        [JsonIgnore]
+        public string DefendingFaction => Defender?.Faction ?? "Unknown";
+
+        [JsonIgnore]
+        public InvasionReward AttackerReward => Attacker?.Reward;
+
+        [JsonIgnore]
+        public InvasionReward DefenderReward => Defender?.Reward;
+
+        // Computed display properties
+        [JsonIgnore]
+        public string AttackerDisplay => !string.IsNullOrEmpty(AttackingFaction) ? AttackingFaction : "Unknown";
+
+        [JsonIgnore]
+        public string DefenderDisplay => !string.IsNullOrEmpty(DefendingFaction) ? DefendingFaction : "Unknown";
+    }
+
+    public class InvasionSide
+    {
+        [JsonProperty("faction")]
+        public string Faction { get; set; }
+
+        [JsonProperty("factionKey")]
+        public string FactionKey { get; set; }
+
+        [JsonProperty("reward")]
+        public InvasionReward Reward { get; set; }
     }
 
     public class InvasionReward
     {
         [JsonProperty("asString")]
         public string AsString { get; set; }
+
+        [JsonProperty("itemType")]
+        public string ItemType { get; set; }
+
+        [JsonProperty("countedItem")]
+        public string CountedItem { get; set; }
+
+        [JsonProperty("items")]
+        public List<string> Items { get; set; } = new List<string>();
+
+        [JsonProperty("countedItems")]
+        public List<CountedItem> CountedItems { get; set; } = new List<CountedItem>();
+
+        [JsonProperty("credits")]
+        public int Credits { get; set; }
+
+        [JsonProperty("thumbnail")]
+        public string Thumbnail { get; set; }
+
+        [JsonProperty("color")]
+        public int? Color { get; set; }
+    }
+
+    public class CountedItem
+    {
+        [JsonProperty("count")]
+        public int Count { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("key")]
+        public string Key { get; set; }
     }
 
     // ── Cycles ─────────────────────────────────────────────

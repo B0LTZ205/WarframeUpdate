@@ -1,0 +1,86 @@
+@model WarframeUpdate.Models.UserTask
+
+@{
+    ViewBag.Title = "Task Details";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>@Model.Title</h2>
+            <p class="text-muted">Created on @Model.CreatedAt.ToString("MMM dd, yyyy")</p>
+
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    Task Information
+                </div>
+                <div class="card-body">
+                    <p><strong>Description:</strong></p>
+                    <p>@(string.IsNullOrEmpty(Model.Description) ? "No description provided." : Model.Description)</p>
+
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <strong>Priority:</strong>
+                            <br />
+                            <span class="badge bg-@(Model.Priority == WarframeUpdate.Models.TaskPriority.Critical ? "danger" :
+                                                     Model.Priority == WarframeUpdate.Models.TaskPriority.High ? "warning" :
+                                                     Model.Priority == WarframeUpdate.Models.TaskPriority.Medium ? "info" : "secondary")">
+                                @Model.Priority
+                            </span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Status:</strong>
+                            <br />
+                            <span class="badge bg-@(Model.Status == WarframeUpdate.Models.TaskStatus.Completed ? "success" :
+                                                     Model.Status == WarframeUpdate.Models.TaskStatus.InProgress ? "info" :
+                                                     Model.Status == WarframeUpdate.Models.TaskStatus.Cancelled ? "danger" : "warning")">
+                                @Model.Status
+                            </span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Due Date:</strong>
+                            <br />
+                            @Model.DueDate.ToString("MMM dd, yyyy")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.Completions != null && Model.Completions.Any())
+            {
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        Completion History
+                    </div>
+                    <div class="card-body">
+                        @foreach (var completion in Model.Completions.OrderByDescending(c => c.CompletedAt))
+                        {
+                            <div class="mb-3">
+                                <p>
+                                    <strong>Completed by:</strong> @completion.User.UserName<br />
+                                    <strong>Date:</strong> @completion.CompletedAt.ToString("MMM dd, yyyy HH:mm")<br />
+                                    @if (!string.IsNullOrEmpty(completion.CompletionNotes))
+                                    {
+                                        <strong>Notes:</strong> @completion.CompletionNotes
+                                    }
+                                </p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-warning w-100 mb-2">
+                        <i class="fas fa-edit"></i> Edit Task
+                    </a>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary w-100">
+                        <i class="fas fa-arrow-left"></i> Back to Tasks
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

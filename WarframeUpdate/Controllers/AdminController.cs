@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using System.Data.Entity;
 using WarframeUpdate.Filters;
 using WarframeUpdate.Models;
 
@@ -36,6 +37,7 @@ namespace WarframeUpdate.Controllers
         {
             const int pageSize = 10;
             var users = db.Users
+                .Include("UserProfile") 
                 .OrderBy(u => u.UserName)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

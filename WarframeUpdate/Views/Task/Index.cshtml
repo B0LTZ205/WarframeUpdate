@@ -1,0 +1,89 @@
+﻿@model IEnumerable<WarframeUpdate.Models.UserTask>
+
+@{
+    ViewBag.Title = "My Tasks";
+}
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">📋 Task Completion Tracker</h2>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <a href="@Url.Action("Create")" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create New Task
+            </a>
+        </div>
+        <div class="col-md-6">
+            <div class="btn-group" role="group">
+                <a href="@Url.Action("Index")" class="btn btn-outline-secondary @(ViewBag.Status == null ? "active" : "")">All</a>
+                <a href="@Url.Action("Index", new { status = WarframeUpdate.Models.TaskStatus.Pending })" class="btn btn-outline-warning">Pending</a>
+                <a href="@Url.Action("Index", new { status = WarframeUpdate.Models.TaskStatus.InProgress })" class="btn btn-outline-info">In Progress</a>
+                <a href="@Url.Action("Index", new { status = WarframeUpdate.Models.TaskStatus.Completed })" class="btn btn-outline-success">Completed</a>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No tasks found. <a href="@Url.Action("Create")">Create one now!</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Due Date</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var task in Model)
+                    {
+                        var statusBadgeClass = task.Status == WarframeUpdate.Models.TaskStatus.Completed ? "bg-success" :
+                                              task.Status == WarframeUpdate.Models.TaskStatus.InProgress ? "bg-info" :
+                                              task.Status == WarframeUpdate.Models.TaskStatus.Cancelled ? "bg-danger" : "bg-warning";
+
+                        var priorityBadgeClass = task.Priority == WarframeUpdate.Models.TaskPriority.Critical ? "bg-danger" :
+                                               task.Priority == WarframeUpdate.Models.TaskPriority.High ? "bg-warning" :
+                                               task.Priority == WarframeUpdate.Models.TaskPriority.Medium ? "bg-info" : "bg-secondary";
+
+                        <tr>
+                            <td><strong>@task.Title</strong></td>
+                            <td>@(string.IsNullOrEmpty(task.Description) ? "-" : task.Description)</td>
+                            <td>
+                                <span class="badge @priorityBadgeClass">@task.Priority</span>
+                            </td>
+                            <td>
+                                <span class="badge @statusBadgeClass">@task.Status</span>
+                            </td>
+                            <td>@task.DueDate.ToString("MMM dd, yyyy")</td>
+                            <td>@task.CreatedAt.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                <a href="@Url.Action("Details", new { id = task.Id })" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <a href="@Url.Action("Edit", new { id = task.Id })" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <form method="post" action="@Url.Action("Delete", new { id = task.Id })" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this task?')">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -175,6 +175,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\PreferencesController.cs" />
+    <Compile Include="Controllers\TaskController.cs" />
     <Compile Include="Filters\AdminAuthorizeAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -192,6 +193,10 @@
     <Compile Include="Migrations\202605021408070_UpdateDatabase.cs" />
     <Compile Include="Migrations\202605021408070_UpdateDatabase.Designer.cs">
       <DependentUpon>202605021408070_UpdateDatabase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202605071938199_AddTaskCompletionTracking.cs" />
+    <Compile Include="Migrations\202605071938199_AddTaskCompletionTracking.Designer.cs">
+      <DependentUpon>202605071938199_AddTaskCompletionTracking.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -284,6 +289,8 @@
     <Content Include="Views\Admin\UserDetails.cshtml" />
     <Content Include="Views\Admin\ActivityLogs.cshtml" />
     <Content Include="Views\Manage\UpdateProfile.cshtml" />
+    <Content Include="Views\Task\Index.cshtml" />
+    <Content Include="Views\Task\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -324,6 +331,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202605021408070_UpdateDatabase.resx">
       <DependentUpon>202605021408070_UpdateDatabase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202605071938199_AddTaskCompletionTracking.resx">
+      <DependentUpon>202605071938199_AddTaskCompletionTracking.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

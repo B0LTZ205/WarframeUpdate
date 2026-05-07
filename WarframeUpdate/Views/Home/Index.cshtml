@@ -146,6 +146,8 @@
         </div>
     </section>
 
+    @Html.AntiForgeryToken()
+    
     <!-- ═══ NIGHTWAVE ═══ -->
     <section id="nightwave" class="card card--nightwave">
         <div class="card-header">
@@ -178,7 +180,7 @@
                                     <div class="challenge-title">@ch.Title</div>
                                     <div class="challenge-desc">@ch.Desc</div>
                                 </div>
-                                <div class="challenge-rep">@ch.Reputation REP</div>
+                                <div class="challenge-rep">+@ch.Reputation<br/><small>REP</small></div>
                             </div>
                         }
                     </div>
@@ -195,7 +197,7 @@
                                     <div class="challenge-title">@ch.Title</div>
                                     <div class="challenge-desc">@ch.Desc</div>
                                 </div>
-                                <div class="challenge-rep">@ch.Reputation REP</div>
+                                <div class="challenge-rep">+@ch.Reputation<br/><small>REP</small></div>
                             </div>
                         }
                     </div>
@@ -207,12 +209,12 @@
                         <div class="challenge-group-header elite">ELITE WEEKLY</div>
                         @foreach (var ch in elite)
                         {
-                            <div class="challenge-row elite">
+                            <div class="challenge-row">
                                 <div class="challenge-info">
                                     <div class="challenge-title">@ch.Title</div>
                                     <div class="challenge-desc">@ch.Desc</div>
                                 </div>
-                                <div class="challenge-rep">@ch.Reputation REP</div>
+                                <div class="challenge-rep">+@ch.Reputation<br/><small>REP</small></div>
                             </div>
                         }
                     </div>
@@ -352,36 +354,46 @@
                 {
                     <div class="error-state">No active invasions</div>
                 }
-                foreach (var invasion in active)
+                else
                 {
-                    var absPct = (int)Math.Abs(invasion.Completion);
-                    <div class="invasion-row">
-                        <div class="invasion-node">@invasion.Node</div>
-                        <div class="invasion-factions">
-                            <span class="faction attacker">@(invasion.AttackingFaction ?? "?")</span>
-                            <span class="vs">VS</span>
-                            <span class="faction defender">@(invasion.DefendingFaction ?? "?")</span>
-                        </div>
-                        <div class="invasion-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: @absPct%"></div>
+                    foreach (var invasion in active)
+                    {
+                        var absPct = (int)Math.Abs(invasion.Completion);
+                        <div class="invasion-row">
+                            <div class="invasion-desc">@invasion.Description</div>
+                            <div class="invasion-node">@invasion.Node</div>
+                            <div class="invasion-factions">
+                                <span class="faction attacker">@invasion.AttackerDisplay</span>
+                                <span class="vs">VS</span>
+                                <span class="faction defender">@invasion.DefenderDisplay</span>
                             </div>
-                            <span class="progress-pct">@(Math.Round(invasion.Completion, 1))%</span>
-                        </div>
-                        @if (invasion.AttackerReward != null || invasion.DefenderReward != null)
-                        {
-                            <div class="invasion-rewards">
-                                @if (invasion.AttackerReward != null && !string.IsNullOrEmpty(invasion.AttackerReward.AsString))
-                                {
-                                    <span class="reward atk-reward">⚔ @invasion.AttackerReward.AsString</span>
-                                }
-                                @if (invasion.DefenderReward != null && !string.IsNullOrEmpty(invasion.DefenderReward.AsString))
-                                {
-                                    <span class="reward def-reward">🛡 @invasion.DefenderReward.AsString</span>
-                                }
+                            <div class="invasion-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: @absPct%"></div>
+                                </div>
+                                <span class="progress-pct">@(Math.Round(invasion.Completion, 1))%</span>
                             </div>
-                        }
-                    </div>
+                            @if (invasion.AttackerReward != null || invasion.DefenderReward != null)
+                            {
+                                <div class="invasion-rewards">
+                                    @if (invasion.AttackerReward != null && invasion.AttackerReward.CountedItems.Count > 0)
+                                    {
+                                        foreach (var item in invasion.AttackerReward.CountedItems)
+                                        {
+                                            <span class="reward atk-reward">⚔ @item.Count x @item.Type</span>
+                                        }
+                                    }
+                                    @if (invasion.DefenderReward != null && invasion.DefenderReward.CountedItems.Count > 0)
+                                    {
+                                        foreach (var item in invasion.DefenderReward.CountedItems)
+                                        {
+                                            <span class="reward def-reward">🛡 @item.Count x @item.Type</span>
+                                        }
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
                 }
             }
             else

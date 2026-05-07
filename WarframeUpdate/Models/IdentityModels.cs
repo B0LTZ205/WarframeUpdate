@@ -16,6 +16,9 @@ namespace WarframeUpdate.Models
         public virtual ICollection<EventSubscription> EventSubscriptions { get; set; }
         public virtual ICollection<FileUpload> FileUploads { get; set; }
         public virtual ICollection<AdminActivityLog> AdminActivityLogs { get; set; }
+        public virtual ICollection<UserTask> UserTasks { get; set; }
+        public virtual ICollection<TaskCompletion> TaskCompletions { get; set; }
+        public virtual ICollection<NightwaveCompletion> NightwaveCompletions { get; set; }
         public virtual UserProfile UserProfile { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
@@ -38,6 +41,9 @@ namespace WarframeUpdate.Models
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<FileUpload> FileUploads { get; set; }
         public DbSet<AdminActivityLog> AdminActivityLogs { get; set; }
+        public DbSet<UserTask> UserTasks { get; set; }
+        public DbSet<TaskCompletion> TaskCompletions { get; set; }
+        public DbSet<NightwaveCompletion> NightwaveCompletions { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -49,26 +55,32 @@ namespace WarframeUpdate.Models
                 .HasRequired(up => up.User)
                 .WithOptional(au => au.UserProfile);
 
-            // Configure EventSubscription to ApplicationUser relationship (one-to-many)
-            modelBuilder.Entity<EventSubscription>()
-                .HasRequired(es => es.User)
-                .WithMany(au => au.EventSubscriptions)
-                .HasForeignKey(es => es.UserId)
+            // Configure UserTask relationships
+            modelBuilder.Entity<UserTask>()
+                .HasRequired(t => t.User)
+                .WithMany(u => u.UserTasks)
+                .HasForeignKey(t => t.UserId)
                 .WillCascadeOnDelete(true);
 
-            // Configure FileUpload to ApplicationUser relationship (one-to-many)
-            modelBuilder.Entity<FileUpload>()
-                .HasRequired(fu => fu.User)
-                .WithMany(au => au.FileUploads)
-                .HasForeignKey(fu => fu.UserId)
+            modelBuilder.Entity<UserTask>()
+                .HasMany(t => t.Completions)
+                .WithRequired(tc => tc.UserTask)
+                .HasForeignKey(tc => tc.UserTaskId)
                 .WillCascadeOnDelete(true);
 
-            // Configure AdminActivityLog to ApplicationUser relationship (one-to-many)
-            modelBuilder.Entity<AdminActivityLog>()
-                .HasRequired(aal => aal.AdminUser)
-                .WithMany(au => au.AdminActivityLogs)
-                .HasForeignKey(aal => aal.AdminUserId)
+            // Configure TaskCompletion relationships
+            modelBuilder.Entity<TaskCompletion>()
+                .HasRequired(tc => tc.User)
+                .WithMany(u => u.TaskCompletions)
+                .HasForeignKey(tc => tc.CompletedBy)
                 .WillCascadeOnDelete(false);
+
+            // Configure NightwaveCompletion relationships
+            modelBuilder.Entity<NightwaveCompletion>()
+                .HasRequired(nc => nc.User)
+                .WithMany(u => u.NightwaveCompletions)
+                .HasForeignKey(nc => nc.UserId)
+                .WillCascadeOnDelete(true);
         }
 
         public static ApplicationDbContext Create()

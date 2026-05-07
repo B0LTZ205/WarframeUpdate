@@ -17,8 +17,10 @@
             <table class="table table-hover table-striped">
                 <thead class="table-dark">
                     <tr>
+                        <th>Profile</th>
                         <th>Username</th>
                         <th>Email</th>
+                        <th>Phone</th>
                         <th>Joined</th>
                         <th>Email Confirmed</th>
                         <th>Actions</th>
@@ -27,9 +29,46 @@
                 <tbody>
                     @foreach (var user in Model.Items)
                     {
+                        var userProfile = user.UserProfile;
                         <tr>
-                            <td>@user.UserName</td>
+                            <td>
+                                @if (userProfile != null && !string.IsNullOrEmpty(userProfile.ProfilePictureUrl))
+                                {
+                                    <img src="@userProfile.ProfilePictureUrl" 
+                                         alt="@(userProfile.FirstName ?? user.UserName)" 
+                                         class="rounded-circle" 
+                                         style="width: 40px; height: 40px; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center" 
+                                         style="width: 40px; height: 40px; color: white;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                @if (userProfile != null && !string.IsNullOrEmpty(userProfile.FirstName))
+                                {
+                                    <strong>@userProfile.FirstName @userProfile.LastName</strong><br />
+                                    <small class="text-muted">@user.UserName</small>
+                                }
+                                else
+                                {
+                                    @user.UserName
+                                }
+                            </td>
                             <td>@user.Email</td>
+                            <td>
+                                @if (userProfile != null && !string.IsNullOrEmpty(userProfile.PhoneNumber))
+                                {
+                                    @userProfile.PhoneNumber
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
                             <td>@(user.UserName != null ? DateTime.Now.ToString("MMM dd, yyyy") : "N/A")</td>
                             <td>
                                 <span class="badge @(user.EmailConfirmed ? "bg-success" : "bg-warning")">
@@ -103,10 +142,12 @@
 </div>
 
 <script>
-    document.getElementById('deleteModal').addEventListener('show.bs.modal', function (e) {
-        const userId = e.relatedTarget.dataset.userId;
-        const userName = e.relatedTarget.dataset.userName;
+    document.getElementById('deleteModal').addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var userId = button.getAttribute('data-user-id');
+        var userName = button.getAttribute('data-user-name');
+        
         document.getElementById('modalUserName').textContent = userName;
-        document.getElementById('deleteForm').action = '@Url.Action("DeleteUser", "Admin")' + '/' + userId;
+        document.getElementById('deleteForm').action = '@Url.Action("DeleteUser", "Admin")/' + userId;
     });
 </script>

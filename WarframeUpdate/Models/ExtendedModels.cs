@@ -120,4 +120,127 @@ namespace WarframeUpdate.Models
         public bool HasPreviousPage => PageIndex > 1;
         public bool HasNextPage => PageIndex < TotalPages;
     }
+
+    /// <summary>
+    /// UserTask model for tracking user tasks
+    /// </summary>
+    public class UserTask
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string UserId { get; set; }
+
+        [Required]
+        [MaxLength(255)]
+        public string Title { get; set; }
+
+        [MaxLength(1000)]
+        public string Description { get; set; }
+
+        [Required]
+        public TaskStatus Status { get; set; } = TaskStatus.Pending;
+
+        [Required]
+        public TaskPriority Priority { get; set; } = TaskPriority.Medium;
+
+        public DateTime DueDate { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public DateTime? CompletedAt { get; set; }
+
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser User { get; set; }
+
+        public virtual ICollection<TaskCompletion> Completions { get; set; }
+    }
+
+    /// <summary>
+    /// Task Completion tracking model
+    /// </summary>
+    public class TaskCompletion
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public int UserTaskId { get; set; }
+
+        [Required]
+        public string CompletedBy { get; set; }
+
+        [MaxLength(500)]
+        public string CompletionNotes { get; set; }
+
+        public DateTime CompletedAt { get; set; } = DateTime.UtcNow;
+
+        [ForeignKey("UserTaskId")]
+        public virtual UserTask UserTask { get; set; }
+
+        [ForeignKey("CompletedBy")]
+        public virtual ApplicationUser User { get; set; }
+    }
+
+    /// <summary>
+    /// Task Status enum
+    /// </summary>
+    public enum TaskStatus
+    {
+        Pending = 0,
+        InProgress = 1,
+        Completed = 2,
+        Cancelled = 3
+    }
+
+    /// <summary>
+    /// Task Priority enum
+    /// </summary>
+    public enum TaskPriority
+    {
+        Low = 0,
+        Medium = 1,
+        High = 2,
+        Critical = 3
+    }
+
+    /// <summary>
+    /// Nightwave Challenge Completion tracking
+    /// </summary>
+    public class NightwaveCompletion
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string UserId { get; set; }
+
+        [Required]
+        [MaxLength(500)]
+        public string ChallengeTitle { get; set; }
+
+        [Required]
+        [MaxLength(1000)]
+        public string ChallengeDescription { get; set; }
+
+        [Required]
+        public int Reputation { get; set; }
+
+        [Required]
+        public bool IsDaily { get; set; }
+
+        [Required]
+        public bool IsElite { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public string ChallengeExpiry { get; set; }
+
+        [Required]
+        public DateTime CompletedAt { get; set; } = DateTime.UtcNow;
+
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser User { get; set; }
+    }
 }
