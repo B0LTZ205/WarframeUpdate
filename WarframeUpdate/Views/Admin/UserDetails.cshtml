@@ -33,8 +33,19 @@
         <!-- User Info -->
         <div class="col-lg-4">
             <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">👤 User Information</h5>
+                <div class="card-header bg-primary text-white user-info-header">
+
+                    <h5 class="mb-0">
+                        👤 User Information
+                    </h5>
+
+                    <a href="@Url.Action("EditUser", "Admin", new { id = Model.User.Id })"
+                       class="user-info-edit-btn">
+
+                        <i class="fas fa-user-edit"></i>
+                        Edit User
+                    </a>
+
                 </div>
                 <div class="card-body">
                     <p><strong>Username:</strong> @Model.User.UserName</p>
@@ -269,47 +280,6 @@
 
             @if (Model.UserProfile != null && !string.IsNullOrEmpty(Model.UserProfile.ProfilePictureUrl))
             {
-                <button type="button"
-                        class="btn btn-outline-info mt-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#profilePictureModal">
-                    View Profile Picture
-                </button>
-
-                <div class="modal fade"
-                     id="profilePictureModal"
-                     tabindex="-1"
-                     aria-labelledby="profilePictureModalLabel"
-                     aria-hidden="true">
-
-                    <div class="modal-dialog modal-dialog-centered modal-lg">
-
-                        <div class="modal-content bg-dark text-light">
-
-                            <div class="modal-header">
-                                <h5 class="modal-title"
-                                    id="profilePictureModalLabel">
-                                    Profile Picture Preview
-                                </h5>
-
-                                <button type="button"
-                                        class="btn-close btn-close-white"
-                                        data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                            </div>
-
-                            <div class="modal-body text-center">
-
-                                <img src="@Url.Content(Model.UserProfile.ProfilePictureUrl)"
-                                     class="img-fluid rounded"
-                                     style="max-height:70vh;" />
-
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
                 <p class="text-muted mt-3">
                     Remove this image if it violates rules or contains inappropriate content.
                 </p>
@@ -338,13 +308,6 @@
 
 </div>
 
-@Html.ActionLink(
-    "Edit User Info",
-    "EditUser",
-    "Admin",
-    new { id = Model.User.Id },
-    new { @class = "btn btn-primary mt-3" }
-)
 
 
 @functions {
