@@ -243,4 +243,32 @@ namespace WarframeUpdate.Models
         [ForeignKey("UserId")]
         public virtual ApplicationUser User { get; set; }
     }
+
+    public class Notification
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string UserId { get; set; }
+
+        [Required]
+        [MaxLength(150)]
+        public string Title { get; set; }
+
+        [Required]
+        [MaxLength(1000)]
+        public string Message { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public string Type { get; set; }
+
+        public bool IsRead { get; set; } = false;
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser User { get; set; }
+    }
 }

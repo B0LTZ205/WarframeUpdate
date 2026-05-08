@@ -181,6 +181,7 @@
     <Compile Include="Controllers\FileUploadController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\PreferencesController.cs" />
     <Compile Include="Controllers\TaskController.cs" />
     <Compile Include="Filters\AdminAuthorizeAttribute.cs" />
@@ -204,6 +205,10 @@
     <Compile Include="Migrations\202605071938199_AddTaskCompletionTracking.cs" />
     <Compile Include="Migrations\202605071938199_AddTaskCompletionTracking.Designer.cs">
       <DependentUpon>202605071938199_AddTaskCompletionTracking.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202605080103263_AddNotifications.cs" />
+    <Compile Include="Migrations\202605080103263_AddNotifications.Designer.cs">
+      <DependentUpon>202605080103263_AddNotifications.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -298,6 +303,9 @@
     <Content Include="Views\Manage\UpdateProfile.cshtml" />
     <Content Include="Views\Task\Index.cshtml" />
     <Content Include="Views\Task\Details.cshtml" />
+    <Content Include="Views\Account\DisplayEmail.cshtml" />
+    <Content Include="Views\Notifications\Index.cshtml" />
+    <Content Include="Views\Notifications\_UnreadCount.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -341,6 +349,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202605071938199_AddTaskCompletionTracking.resx">
       <DependentUpon>202605071938199_AddTaskCompletionTracking.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202605080103263_AddNotifications.resx">
+      <DependentUpon>202605080103263_AddNotifications.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

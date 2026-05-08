@@ -1,5 +1,6 @@
-using System.Collections.Generic;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace WarframeTracker.Models
 {
@@ -82,7 +83,7 @@ namespace WarframeTracker.Models
         public int TierNum { get; set; }
 
         [JsonProperty("expiry")]
-        public string Expiry { get; set; }
+        public DateTime Expiry { get; set; }
 
         [JsonProperty("active")]
         public bool Active { get; set; }

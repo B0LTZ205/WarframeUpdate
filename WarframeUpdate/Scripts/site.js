@@ -1,7 +1,7 @@
 /*  ═══════════════════════════════════════════
     WARFRAME TRACKER — CLIENT SCRIPT
     ═══════════════════════════════════════════ */
-
+let dashboardRefreshing = false;
 // ── Server Clock ──────────────────────────────────────────
 function updateServerTime() {
     const el = document.getElementById('server-time');
@@ -33,8 +33,11 @@ function tickCountdowns() {
     document.querySelectorAll('.countdown[data-expiry]').forEach(el => {
         const expiry = new Date(el.dataset.expiry).getTime();
         const remaining = expiry - now;
-        el.textContent = formatRemaining(remaining);
-
+        if (remaining > 0) {
+            el.textContent = formatRemaining(remaining);
+        } else {
+            el.textContent = "UPDATING...";
+        }
         // Turn red when under 30 minutes
         if (remaining < 30 * 60 * 1000 && remaining > 0) {
             el.classList.add('urgent');
@@ -51,9 +54,14 @@ function tickCountdowns() {
 
     // Refresh data when any timer expires
     if (shouldRefresh) {
-        setTimeout(() => {
-            refreshDashboardData();
-        }, 1000);
+        // Refresh data when any timer expires
+        if (shouldRefresh && !dashboardRefreshing) {
+            dashboardRefreshing = true;
+
+            refreshDashboardData().finally(() => {
+                dashboardRefreshing = false;
+            });
+        }
     }
 }
 
@@ -121,7 +129,7 @@ function tickCycleTimers() {
     document.querySelectorAll('.cycle-timer[data-expiry]').forEach(el => {
         const expiry = new Date(el.dataset.expiry).getTime();
         const remaining = expiry - now;
-        if (remaining > 0) {
+        if (remaining >= 1000) {
             const totalSec = Math.floor(remaining / 1000);
             const m = Math.floor(totalSec / 60);
             const s = totalSec % 60;

@@ -93,6 +93,11 @@
                             </ul>
                         </li>
                     </ul>
+                    @*Notifications Button*@
+            <a class="nav-link" href="@Url.Action("Index", "Notifications")">
+                <i class="fas fa-bell"></i> Notifications
+                @Html.Action("UnreadCount", "Notifications")
+            </a>
                 }
                 else
                 {

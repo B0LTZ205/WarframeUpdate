@@ -19,6 +19,8 @@ namespace WarframeUpdate.Models
         public virtual ICollection<UserTask> UserTasks { get; set; }
         public virtual ICollection<TaskCompletion> TaskCompletions { get; set; }
         public virtual ICollection<NightwaveCompletion> NightwaveCompletions { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
+
         public virtual UserProfile UserProfile { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
@@ -37,6 +39,7 @@ namespace WarframeUpdate.Models
         {
         }
 
+
         public DbSet<EventSubscription> EventSubscriptions { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<FileUpload> FileUploads { get; set; }
@@ -44,6 +47,7 @@ namespace WarframeUpdate.Models
         public DbSet<UserTask> UserTasks { get; set; }
         public DbSet<TaskCompletion> TaskCompletions { get; set; }
         public DbSet<NightwaveCompletion> NightwaveCompletions { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -80,6 +84,12 @@ namespace WarframeUpdate.Models
                 .HasRequired(nc => nc.User)
                 .WithMany(u => u.NightwaveCompletions)
                 .HasForeignKey(nc => nc.UserId)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<Notification>()
+                .HasRequired(n => n.User)
+                .WithMany(u => u.Notifications)
+                .HasForeignKey(n => n.UserId)
                 .WillCascadeOnDelete(true);
         }
 

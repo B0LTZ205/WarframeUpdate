@@ -35,7 +35,7 @@ namespace WarframeUpdate
                 from,
                 to,
                 message.Subject,
-                message.Body,
+                null,
                 message.Body
             );
 

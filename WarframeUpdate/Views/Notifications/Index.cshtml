@@ -1,0 +1,45 @@
+﻿@model IEnumerable<WarframeUpdate.Models.Notification>
+
+@{
+    ViewBag.Title = "Notifications";
+}
+
+<div class="container mt-4">
+    <h2>Notifications</h2>
+
+    @using (Html.BeginForm("MarkAllAsRead", "Notifications", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <button class="btn btn-primary mb-3" type="submit">Mark All As Read</button>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No notifications yet.</div>
+    }
+    else
+    {
+        foreach (var item in Model)
+        {
+            <div class="card mb-3 @(item.IsRead ? "" : "border-info")">
+                <div class="card-body">
+                    <h5>@item.Title</h5>
+                    <p>@item.Message</p>
+                    <small>@item.CreatedAt.ToLocalTime()</small>
+
+                    @if (!item.IsRead)
+                    {
+                        using (Html.BeginForm("MarkAsRead", "Notifications", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("id", item.Id)
+                            <button class="btn btn-sm btn-outline-light mt-2" type="submit">
+                                Mark as Read
+                            </button>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>

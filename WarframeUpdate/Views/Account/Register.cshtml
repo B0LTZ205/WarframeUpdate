@@ -21,8 +21,10 @@
                         {
                             @Html.AntiForgeryToken()
 
-                            @Html.ValidationSummary("", new { @class = "alert alert-danger alert-validation" })
-
+                            if (!ViewData.ModelState.IsValid)
+                            {
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger alert alert-danger" })
+                            }
                             <div class="mb-3">
                                 @Html.LabelFor(m => m.Email, new { @class = "form-label" })
                                 @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-lg", placeholder = "your@email.com" })
@@ -48,7 +50,7 @@
 
                             <div class="d-grid gap-2">
                                 <small class="text-center">
-                                    Already registered? 
+                                    Already registered?
                                     <br />
                                     @Html.ActionLink("Sign in here", "Login", "Account", new { }, new { @class = "link-gold fw-bold" })
                                 </small>

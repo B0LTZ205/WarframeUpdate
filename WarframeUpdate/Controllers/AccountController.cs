@@ -68,8 +68,11 @@ namespace WarframeUpdate.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            if (!ModelState.IsValid)
+            var user = await UserManager.FindByNameAsync(model.Email);
+
+            if (user != null && !await UserManager.IsEmailConfirmedAsync(user.Id))
             {
+                ModelState.AddModelError("", "You must confirm your email before logging in.");
                 return View(model);
             }
 
@@ -155,15 +158,46 @@ namespace WarframeUpdate.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    var code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
 
-                    return RedirectToAction("Index", "Home");
+                    var callbackUrl = Url.Action(
+                        "ConfirmEmail",
+                        "Account",
+                        new { userId = user.Id, code = code },
+                        protocol: Request.Url.Scheme
+                    );
+
+                    string body = $@"
+                    <div style='background-color:#111827;padding:35px;font-family:Arial;color:white;'>
+                        <h1 style='color:#60A5FA;'>Warframe Tracker</h1>
+
+                        <p>Hello {user.UserName},</p>
+
+                        <p>Thanks for creating a Warframe Tracker account.</p>
+
+                        <p>Please confirm your email address by clicking the button below:</p>
+
+                        <p style='margin-top:25px;'>
+                            <a href='{callbackUrl}'
+                               style='background-color:#2563EB;color:white;padding:14px 22px;
+                                      text-decoration:none;border-radius:8px;display:inline-block;'>
+                                Confirm Email
+                            </a>
+                        </p>
+
+                        <p style='margin-top:25px;color:#9CA3AF;font-size:13px;'>
+                            If you did not create this account, you can ignore this email.
+                        </p>
+                    </div>
+                    ";
+
+                    await UserManager.SendEmailAsync(
+                        user.Id,
+                        "Confirm Your Warframe Tracker Email",
+                        body
+                    );
+
+                    return View("DisplayEmail");
                 }
                 AddErrors(result);
             }
@@ -181,8 +215,15 @@ namespace WarframeUpdate.Controllers
             {
                 return View("Error");
             }
+
             var result = await UserManager.ConfirmEmailAsync(userId, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+
+            if (result.Succeeded)
+            {
+                return View("ConfirmEmail");
+            }
+
+            return View("Error");
         }
 
         //
@@ -203,7 +244,7 @@ namespace WarframeUpdate.Controllers
             if (ModelState.IsValid)
             {
                 var user = await UserManager.FindByNameAsync(model.Email);
-                if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
+                if (user == null)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return View("ForgotPasswordConfirmation");
@@ -213,8 +254,45 @@ namespace WarframeUpdate.Controllers
                 // Send an email with this link
                 string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
                 var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                string body = $@"
+                <div style='background-color:#111827;
+                            padding:40px;
+                            font-family:Arial;
+                            color:white;'>
+
+                    <h1 style='color:#60A5FA;'>
+                        Warframe Tracker
+                    </h1>
+
+                    <p>Hello {user.UserName},</p>
+
+                    <p>
+                        We received a request to reset your password.
+                    </p>
+
+                    <p style='margin-top:30px;'>
+                        <a href='{callbackUrl}'
+                           style='background-color:#2563EB;
+                                  color:white;
+                                  padding:14px 24px;
+                                  text-decoration:none;
+                                  border-radius:8px;'>
+                            Reset Password
+                        </a>
+                    </p>
+
+                    <p style='margin-top:30px;color:#9CA3AF;'>
+                        If you did not request this, ignore this email.
+                    </p>
+
+                </div>
+                ";
+
+                await UserManager.SendEmailAsync(
+                    user.Id,
+                    "Reset Your Warframe Tracker Password",
+                    body
+                );                return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
             // If we got this far, something failed, redisplay form

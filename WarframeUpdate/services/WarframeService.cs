@@ -1,9 +1,10 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
-using Newtonsoft.Json;
 using WarframeTracker.Models;
 
 namespace WarframeTracker.Services
@@ -29,7 +30,7 @@ namespace WarframeTracker.Services
         {
             var sortieTask = FetchAsync<SortieModel>("pc/sortie", TimeSpan.FromMinutes(10));
             var nightwaveTask = FetchAsync<NightwaveModel>("pc/nightwave", TimeSpan.FromMinutes(10));
-            var fissuresTask = FetchAsync<List<FissureModel>>("pc/fissures", TimeSpan.FromMinutes(5));
+            var fissuresTask = FetchAsync<List<FissureModel>>("pc/fissures", TimeSpan.FromSeconds(30));
             var voidTraderTask = FetchAsync<VoidTraderModel>("pc/voidTrader", TimeSpan.FromMinutes(30));
             var dailyDealsTask = FetchAsync<List<DailyDealModel>>("pc/dailyDeals", TimeSpan.FromMinutes(10));
             var invasionsTask = FetchAsync<List<InvasionModel>>("pc/invasions", TimeSpan.FromMinutes(5));
@@ -41,6 +42,10 @@ namespace WarframeTracker.Services
             var sortie = await sortieTask;
             var nightwave = await nightwaveTask;
             var fissures = await fissuresTask ?? new List<FissureModel>();
+            fissures = fissures
+                .Where(f => f.Expiry > DateTime.UtcNow)
+                .OrderBy(f => f.Expiry)
+                .ToList();
             var voidTrader = await voidTraderTask;
             var dailyDeals = await dailyDealsTask ?? new List<DailyDealModel>();
             var invasions = await invasionsTask ?? new List<InvasionModel>();
@@ -48,6 +53,7 @@ namespace WarframeTracker.Services
             var vallisCycle = await vallisCycleTask;
 
             System.Diagnostics.Debug.WriteLine($"[WarframeService] Dashboard loaded - Fissures count: {fissures?.Count ?? 0}");
+
 
             return new DashboardViewModel
             {
@@ -60,6 +66,7 @@ namespace WarframeTracker.Services
                 CetusCycle = cetusCycle,
                 VallisCycle = vallisCycle,
             };
+
         }
 
         private static async Task<T> FetchAsync<T>(string endpoint, TimeSpan cacheDuration) where T : class
