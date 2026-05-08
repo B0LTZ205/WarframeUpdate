@@ -34,7 +34,7 @@
                 <a href="#fissures" class="nav-link">FISSURES</a>
                 <a href="#voidtrader" class="nav-link">BARO</a>
                 <a href="#invasions" class="nav-link">INVASIONS</a>
-                
+
                 <!-- Files Dropdown -->
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="fileDropdown" role="button" data-bs-toggle="dropdown">
@@ -111,11 +111,9 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/Scripts/site.js"></script>
-    @section Scripts {
-        @Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/bootstrap")
-        @RenderSection("Scripts", required: false)
-    }
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("Scripts", required: false)
 </body>
 
 </html>

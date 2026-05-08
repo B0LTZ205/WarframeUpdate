@@ -1,25 +1,45 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin;
+using Microsoft.Owin.Security;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin;
-using Microsoft.Owin.Security;
 using WarframeUpdate.Models;
 
 namespace WarframeUpdate
 {
     public class EmailService : IIdentityMessageService
     {
-        public Task SendAsync(IdentityMessage message)
+        public async Task SendAsync(IdentityMessage message)
         {
-            // Plug in your email service here to send an email.
-            return Task.FromResult(0);
+            var apiKey = ConfigurationManager.AppSettings["SendGridApiKey"];
+
+            var fromEmail = ConfigurationManager.AppSettings["SendGridEmail"];
+
+            var client = new SendGridClient(apiKey);
+
+            var from = new EmailAddress(fromEmail, "Warframe Tracker");
+
+            var to = new EmailAddress(message.Destination);
+
+            var msg = MailHelper.CreateSingleEmail(
+                from,
+                to,
+                message.Subject,
+                message.Body,
+                message.Body
+            );
+
+            await client.SendEmailAsync(msg);
         }
     }
 
