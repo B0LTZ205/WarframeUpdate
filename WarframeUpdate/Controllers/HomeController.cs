@@ -24,7 +24,6 @@ namespace WarframeUpdate.Controllers
             return View(vm);
         }
 
-        // API endpoint to refresh dashboard data without page reload
         [HttpGet]
         public async Task<JsonResult> RefreshData()
         {

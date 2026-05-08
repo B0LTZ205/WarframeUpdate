@@ -652,3 +652,99 @@ body {
     margin-left: 0.5rem;
     padding-top: 2px;
 }
+
+
+.admin-management-section {
+    max-width: 800px;
+}
+
+.admin-card {
+    background: #151b2c;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    transition: all 0.2s ease;
+}
+
+    .admin-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+    }
+
+.section-title {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+    .section-title i {
+        margin-right: 10px;
+        color: #60a5fa;
+    }
+
+.status-badge {
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.admin-badge {
+    background: rgba(255,193,7,0.15);
+    color: #ffc107;
+    border: 1px solid rgba(255,193,7,0.35);
+}
+
+.user-badge {
+    background: rgba(108,117,125,0.15);
+    color: #adb5bd;
+    border: 1px solid rgba(108,117,125,0.35);
+}
+
+.verified-badge {
+    background: rgba(25,135,84,0.15);
+    color: #3ddc97;
+    border: 1px solid rgba(25,135,84,0.35);
+}
+
+.unverified-badge {
+    background: rgba(220,53,69,0.15);
+    color: #ff6b81;
+    border: 1px solid rgba(220,53,69,0.35);
+}
+
+.admin-btn {
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 10px 18px;
+    min-width: 220px;
+}
+
+.pfp-preview-wrapper {
+    margin-top: 15px;
+}
+
+.admin-pfp-preview {
+    width: 140px !important;
+    height: 140px !important;
+    max-width: 140px !important;
+    max-height: 140px !important;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #60a5fa;
+    box-shadow: 0 0 18px rgba(96, 165, 250, 0.35);
+}
+
+    .admin-pfp-preview:hover {
+        transform: scale(1.03);
+        transition: 0.2s ease;
+    }
+
+.modal-pfp-preview {
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: 10px;
+}

@@ -8,9 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600&family=Share+Tech+Mono&display=swap"
-        rel="stylesheet">
+          rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="~/Content/site.css" />
 </head>
 
@@ -36,7 +37,7 @@
                 <a href="#invasions" class="nav-link">INVASIONS</a>
 
                 <!-- Files Dropdown -->
-                <div class="nav-item dropdown">
+                <!--<div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="fileDropdown" role="button" data-bs-toggle="dropdown">
                         📁 Files
                     </a>
@@ -44,7 +45,7 @@
                         <li><a class="dropdown-item" href="@Url.Action("Index", "FileUpload")">My Files</a></li>
                         <li><a class="dropdown-item" href="@Url.Action("Upload", "FileUpload")">Upload File</a></li>
                     </ul>
-                </div>
+                </div>-->
 
                 @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
                 {
@@ -94,10 +95,10 @@
                         </li>
                     </ul>
                     @*Notifications Button*@
-            <a class="nav-link" href="@Url.Action("Index", "Notifications")">
-                <i class="fas fa-bell"></i> Notifications
-                @Html.Action("UnreadCount", "Notifications")
-            </a>
+                    <a class="nav-link" href="@Url.Action("Index", "Notifications")">
+                        <i class="fas fa-bell"></i> Notifications
+                        @Html.Action("UnreadCount", "Notifications")
+                    </a>
                 }
                 else
                 {
@@ -113,8 +114,8 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/Scripts/site.js"></script>
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

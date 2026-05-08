@@ -145,6 +145,22 @@ namespace WarframeUpdate.Models
         public string ConfirmPassword { get; set; }
     }
 
+    public class AdminEditUserViewModel
+    {
+        public string Id { get; set; }
+
+        [Required]
+        [Display(Name = "Username")]
+        public string UserName { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Display(Name = "Email Confirmed")]
+        public bool EmailConfirmed { get; set; }
+    }
+
     /// <summary>
     /// View model for profile management
     /// </summary>

@@ -1,9 +1,13 @@
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
 using System.Data.Entity;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Mvc;
 using WarframeUpdate.Filters;
 using WarframeUpdate.Models;
 
@@ -13,6 +17,36 @@ namespace WarframeUpdate.Controllers
     public class AdminController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+
+
+        private ApplicationUserManager _userManager;
+        private RoleManager<IdentityRole> _roleManager;
+
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
+
+        public RoleManager<IdentityRole> RoleManager
+        {
+            get
+            {
+                return _roleManager ?? new RoleManager<IdentityRole>(
+                    new RoleStore<IdentityRole>(db)
+                );
+            }
+            private set
+            {
+                _roleManager = value;
+            }
+        }
 
         // GET: Admin/Dashboard
         public ActionResult Dashboard()
@@ -79,6 +113,9 @@ namespace WarframeUpdate.Controllers
             };
 
             LogAdminActivity($"Viewed User Details: {user.UserName}");
+
+            ViewBag.IsAdmin = UserManager.IsInRole(id, "Admin");
+
             return View(viewModel);
         }
 
@@ -145,6 +182,71 @@ namespace WarframeUpdate.Controllers
             }
         }
 
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> MakeAdmin(string id)
+        {
+            var user = await UserManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            // Create Admin role if missing
+            if (!await RoleManager.RoleExistsAsync("Admin"))
+            {
+                await RoleManager.CreateAsync(new IdentityRole("Admin"));
+            }
+
+            // Prevent duplicate role assignment
+            if (!await UserManager.IsInRoleAsync(user.Id, "Admin"))
+            {
+                await UserManager.AddToRoleAsync(user.Id, "Admin");
+
+                LogAdminActivity($"Promoted User To Admin: {user.UserName}");
+
+                TempData["SuccessMessage"] = $"{user.UserName} is now an admin.";
+            }
+
+            return RedirectToAction("UserDetails", new { id });
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RemoveAdmin(string id)
+        {
+            var currentUserId = User.Identity.GetUserId();
+
+            // Prevent removing yourself
+            if (id == currentUserId)
+            {
+                TempData["ErrorMessage"] = "You cannot remove your own admin role.";
+                return RedirectToAction("UserDetails", new { id });
+            }
+
+            var user = await UserManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (await UserManager.IsInRoleAsync(user.Id, "Admin"))
+            {
+                await UserManager.RemoveFromRoleAsync(user.Id, "Admin");
+
+                LogAdminActivity($"Removed Admin Role: {user.UserName}");
+
+                TempData["SuccessMessage"] = $"{user.UserName} is no longer an admin.";
+            }
+
+            return RedirectToAction("UserDetails", new { id });
+        }
+
         /// <summary>
         /// Logs admin activity
         /// </summary>
@@ -171,6 +273,123 @@ namespace WarframeUpdate.Controllers
             }
             base.Dispose(disposing);
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ConfirmEmail(string id)
+        {
+            var user = db.Users.Find(id);
+
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            user.EmailConfirmed = true;
+            db.SaveChanges();
+
+            LogAdminActivity($"Force confirmed email for user: {user.UserName}");
+
+            TempData["SuccessMessage"] = $"{user.UserName}'s email has been confirmed.";
+
+            return RedirectToAction("UserDetails", new { id });
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UnconfirmEmail(string id)
+        {
+            var user = db.Users.Find(id);
+
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            user.EmailConfirmed = false;
+            db.SaveChanges();
+
+            LogAdminActivity($"Removed email confirmation for user: {user.UserName}");
+
+            TempData["SuccessMessage"] = $"{user.UserName}'s email confirmation has been removed.";
+
+            return RedirectToAction("UserDetails", new { id });
+        }
+
+        // GET: Admin/EditUser/5
+        public ActionResult EditUser(string id)
+        {
+            var user = db.Users.Find(id);
+
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            var viewModel = new AdminEditUserViewModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                EmailConfirmed = user.EmailConfirmed
+            };
+
+            return View(viewModel);
+        }
+
+        // POST: Admin/EditUser/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditUser(AdminEditUserViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = db.Users.Find(model.Id);
+
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            user.UserName = model.UserName;
+            user.Email = model.Email;
+            user.EmailConfirmed = model.EmailConfirmed;
+
+            db.SaveChanges();
+
+            LogAdminActivity($"Edited User Info: {user.UserName}");
+
+            TempData["SuccessMessage"] = "User information updated successfully.";
+
+            return RedirectToAction("UserDetails", new { id = user.Id });
+        }
+
+        [HttpPost]
+[ValidateAntiForgeryToken]
+public ActionResult DeleteProfilePicture(string id)
+{
+    var profile = db.UserProfiles.FirstOrDefault(p => p.UserId == id);
+
+    if (profile == null)
+    {
+        TempData["ErrorMessage"] = "User profile was not found.";
+        return RedirectToAction("UserDetails", new { id });
+    }
+
+    profile.ProfilePictureUrl = null; // change this name if your column is different
+    db.SaveChanges();
+
+    LogAdminActivity($"Deleted profile picture for user ID: {id}");
+
+    TempData["SuccessMessage"] = "Profile picture removed successfully.";
+
+    return RedirectToAction("UserDetails", new { id });
+}
     }
 
     /// <summary>
@@ -193,5 +412,16 @@ namespace WarframeUpdate.Controllers
         public UserProfile UserProfile { get; set; }
         public List<FileUpload> FileUploads { get; set; }
         public List<EventSubscription> EventSubscriptions { get; set; }
+    }
+
+    public class AdminEditUserViewModel
+    {
+        public string Id { get; set; }
+
+        public string UserName { get; set; }
+
+        public string Email { get; set; }
+
+        public bool EmailConfirmed { get; set; }
     }
 }
