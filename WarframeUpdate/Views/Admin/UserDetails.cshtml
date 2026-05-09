@@ -1,314 +1,306 @@
 ﻿@model WarframeUpdate.Controllers.AdminUserDetailsViewModel
-
 @{
     ViewBag.Title = "User Details";
 }
 
+<div class="admin-dashboard-wrap">
 
-
-<div class="container-fluid mt-4">
-    <div class="row">
-        <div class="col-lg-12">
-            <a href="@Url.Action("Users", "Admin")" class="btn btn-secondary mb-3">
-                <i class="fas fa-arrow-left"></i> Back to Users
-            </a>
-        </div>
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+        <a href="@Url.Action("Users", "Admin")"
+           style="font-family:var(--font-hud);font-size:0.7rem;font-weight:700;letter-spacing:0.1em;padding:0.35rem 0.8rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);border-radius:2px;text-decoration:none;transition:all 0.2s;">
+            ← BACK TO USERS
+        </a>
+        <h2 class="admin-page-title" style="margin:0;">👤 USER DETAILS</h2>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success">
-            @TempData["SuccessMessage"]
+        <div style="padding:0.65rem 1rem;background:rgba(64,216,128,0.08);border:1px solid rgba(64,216,128,0.3);border-radius:2px;font-family:var(--font-mono);font-size:0.75rem;color:var(--green);margin-bottom:1rem;">
+            ✓ @TempData["SuccessMessage"]
         </div>
     }
-
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger">
-            @TempData["ErrorMessage"]
+        <div style="padding:0.65rem 1rem;background:rgba(216,64,64,0.08);border:1px solid rgba(216,64,64,0.3);border-radius:2px;font-family:var(--font-mono);font-size:0.75rem;color:#e88080;margin-bottom:1rem;">
+            ⚠ @TempData["ErrorMessage"]
         </div>
     }
 
-    <div class="row">
-        <!-- User Info -->
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white user-info-header">
+    <!-- Top row: user info + stats -->
+    <div style="display:grid;grid-template-columns:320px 1fr;gap:1.25rem;margin-bottom:1.25rem;">
 
-                    <h5 class="mb-0">
-                        👤 User Information
-                    </h5>
-
-                    <a href="@Url.Action("EditUser", "Admin", new { id = Model.User.Id })"
-                       class="user-info-edit-btn">
-
-                        <i class="fas fa-user-edit"></i>
-                        Edit User
-                    </a>
-
-                </div>
-                <div class="card-body">
-                    <p><strong>Username:</strong> @Model.User.UserName</p>
-                    <p><strong>Email:</strong> @Model.User.Email</p>
-                    <p>
-                        <strong>Email Confirmed:</strong>
-                        <span class="badge @(Model.User.EmailConfirmed ? "bg-success" : "bg-warning")">
-                            @(Model.User.EmailConfirmed ? "Yes" : "No")
-                        </span>
-                    </p>
-
-                    @if (Model.UserProfile != null)
+        <!-- User Info Card -->
+        <div class="admin-panel" style="align-self:start;">
+            <div class="admin-panel-header" style="justify-content:space-between;">
+                <span>👤 USER INFO</span>
+                <a href="@Url.Action("EditUser", "Admin", new { id = Model.User.Id })"
+                   style="font-family:var(--font-mono);font-size:0.6rem;color:var(--accent);text-decoration:none;letter-spacing:0.08em;">
+                    ✏ EDIT
+                </a>
+            </div>
+            <div class="admin-panel-body">
+                <!-- Avatar -->
+                <div style="text-align:center;margin-bottom:1rem;">
+                    @if (Model.UserProfile != null && !string.IsNullOrEmpty(Model.UserProfile.ProfilePictureUrl))
                     {
-                        <hr />
-                        <p><strong>First Name:</strong> @Model.UserProfile.FirstName</p>
-                        <p><strong>Last Name:</strong> @Model.UserProfile.LastName</p>
-                        if (!string.IsNullOrEmpty(Model.UserProfile.PhoneNumber))
-                        {
-                            <p><strong>Phone:</strong> @Model.UserProfile.PhoneNumber</p>
-                        }
-                        <p><strong>Member Since:</strong> @Model.UserProfile.CreatedAt.ToString("MMM dd, yyyy")</p>
-                    }
-
-                    @if (ViewBag.IsAdmin == true)
-                    {
-                        <span class="badge bg-warning text-dark">Admin</span>
+                        <img src="@Model.UserProfile.ProfilePictureUrl" alt="Profile"
+                             style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border);" />
                     }
                     else
                     {
-                        <span class="badge bg-secondary">Standard User</span>
+                        <div style="width:80px;height:80px;border-radius:50%;background:var(--bg-card-alt);border:2px solid var(--border);display:inline-flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:1.75rem;">
+                            <i class="fas fa-user"></i>
+                        </div>
                     }
-                </div>
-            </div>
-        </div>
-
-
-
-        <!-- Stats -->
-        <div class="col-lg-8">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card mb-4 bg-success text-white">
-                        <div class="card-body">
-                            <h6 class="card-title">Total Files Uploaded</h6>
-                            <h2>@Model.FileUploads.Count</h2>
-                        </div>
+                    <div style="margin-top:0.5rem;">
+                        @if (ViewBag.IsAdmin == true)
+                        {
+                            <span style="font-family:var(--font-mono);font-size:0.6rem;padding:0.15rem 0.5rem;background:rgba(200,168,75,0.12);color:var(--gold);border:1px solid var(--gold-dim);border-radius:2px;">⚙ ADMIN</span>
+                        }
+                        else
+                        {
+                            <span style="font-family:var(--font-mono);font-size:0.6rem;padding:0.15rem 0.5rem;background:rgba(96,112,144,0.15);color:var(--text-dim);border:1px solid var(--border);border-radius:2px;">USER</span>
+                        }
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="card mb-4 bg-info text-white">
-                        <div class="card-body">
-                            <h6 class="card-title">Event Subscriptions</h6>
-                            <h2>@Model.EventSubscriptions.Where(s => s.IsSubscribed).Count()</h2>
+
+                <div class="profile-field">
+                    <span class="profile-field-label">USERNAME</span>
+                    <span class="profile-field-value" style="font-family:var(--font-hud);">@Model.User.UserName</span>
+                </div>
+                <div class="profile-field">
+                    <span class="profile-field-label">EMAIL</span>
+                    <span class="profile-field-value" style="font-family:var(--font-mono);font-size:0.72rem;">@Model.User.Email</span>
+                </div>
+                <div class="profile-field">
+                    <span class="profile-field-label">VERIFIED</span>
+                    <span class="profile-field-value">
+                        @if (Model.User.EmailConfirmed)
+                        {
+                            <span style="font-family:var(--font-mono);font-size:0.6rem;color:var(--green);">✓ YES</span>
+                        }
+                        else
+                        {
+                            <span style="font-family:var(--font-mono);font-size:0.6rem;color:var(--gold);">PENDING</span>
+                        }
+                    </span>
+                </div>
+                @if (Model.UserProfile != null)
+                {
+                    <div class="profile-field">
+                        <span class="profile-field-label">FIRST NAME</span>
+                        <span class="profile-field-value">@(Model.UserProfile.FirstName ?? "—")</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-field-label">LAST NAME</span>
+                        <span class="profile-field-value">@(Model.UserProfile.LastName ?? "—")</span>
+                    </div>
+                    if (!string.IsNullOrEmpty(Model.UserProfile.PhoneNumber))
+                    {
+                        <div class="profile-field">
+                            <span class="profile-field-label">PHONE</span>
+                            <span class="profile-field-value" style="font-family:var(--font-mono);font-size:0.72rem;">@Model.UserProfile.PhoneNumber</span>
                         </div>
+                    }
+                    <div class="profile-field">
+                        <span class="profile-field-label">MEMBER SINCE</span>
+                        <span class="profile-field-value" style="font-family:var(--font-mono);font-size:0.72rem;">@Model.UserProfile.CreatedAt.ToString("MMM dd, yyyy")</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Right column: stats + files + subs -->
+        <div style="display:flex;flex-direction:column;gap:1.25rem;">
+
+            <!-- Mini stat row -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div class="stat-card stat-files">
+                    <div class="stat-label">FILES UPLOADED</div>
+                    <div class="stat-value">@Model.FileUploads.Count</div>
+                </div>
+                <div class="stat-card stat-subs">
+                    <div class="stat-label">SUBSCRIPTIONS</div>
+                    <div class="stat-value">@Model.EventSubscriptions.Count(s => s.IsSubscribed)</div>
+                    <div class="stat-sub">Active</div>
+                </div>
+            </div>
+
+            <!-- Files table -->
+            @if (Model.FileUploads.Any())
+            {
+                <div class="admin-panel">
+                    <div class="admin-panel-header">📁 RECENT FILES</div>
+                    <div style="overflow-x:auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>FILE NAME</th>
+                                    <th>TYPE</th>
+                                    <th>SIZE</th>
+                                    <th>UPLOADED</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var file in Model.FileUploads.OrderByDescending(f => f.UploadedAt).Take(10))
+                                {
+                                    <tr>
+                                        <td style="color:var(--text-primary);">@file.OriginalFileName</td>
+                                        <td>
+                                            <span style="font-family:var(--font-mono);font-size:0.6rem;padding:0.1rem 0.35rem;background:var(--accent-glow);color:var(--accent);border:1px solid var(--accent-dim);border-radius:2px;">@file.FileType</span>
+                                        </td>
+                                        <td><small>@FormatFileSize(file.FileSizeBytes)</small></td>
+                                        <td><small>@file.UploadedAt.ToString("MMM dd, yyyy")</small></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+            }
 
-    <!-- Files -->
-    @if (Model.FileUploads.Any())
-    {
-        <div class="card mb-4">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">📁 Recent Files</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>File Name</th>
-                                <th>Type</th>
-                                <th>Size</th>
-                                <th>Uploaded</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var file in Model.FileUploads.OrderByDescending(f => f.UploadedAt).Take(10))
-                            {
+            <!-- Subscriptions table -->
+            @if (Model.EventSubscriptions.Any())
+            {
+                <div class="admin-panel">
+                    <div class="admin-panel-header">📧 EVENT SUBSCRIPTIONS</div>
+                    <div style="overflow-x:auto;">
+                        <table class="admin-table">
+                            <thead>
                                 <tr>
-                                    <td>@file.OriginalFileName</td>
-                                    <td><span class="badge bg-info">@file.FileType</span></td>
-                                    <td>@FormatFileSize(file.FileSizeBytes)</td>
-                                    <td>@file.UploadedAt.ToString("MMM dd, yyyy")</td>
+                                    <th>EVENT TYPE</th>
+                                    <th>STATUS</th>
+                                    <th>SINCE</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach (var sub in Model.EventSubscriptions)
+                                {
+                                    <tr>
+                                        <td style="font-family:var(--font-hud);color:var(--text-primary);">@sub.EventType</td>
+                                        <td>
+                                            @if (sub.IsSubscribed)
+                                            {
+                                                <span style="font-family:var(--font-mono);font-size:0.6rem;padding:0.1rem 0.4rem;background:rgba(64,216,128,0.1);color:var(--green);border:1px solid rgba(64,216,128,0.3);border-radius:2px;">ACTIVE</span>
+                                            }
+                                            else
+                                            {
+                                                <span style="font-family:var(--font-mono);font-size:0.6rem;padding:0.1rem 0.4rem;background:rgba(96,112,144,0.1);color:var(--text-muted);border:1px solid var(--border);border-radius:2px;">INACTIVE</span>
+                                            }
+                                        </td>
+                                        <td><small>@sub.CreatedAt.ToString("MMM dd, yyyy")</small></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
-    }
+    </div>
 
-    <!-- Subscriptions -->
-    @if (Model.EventSubscriptions.Any())
-    {
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">📧 Event Subscriptions</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Event Type</th>
-                                <th>Status</th>
-                                <th>Subscribed Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var sub in Model.EventSubscriptions)
-                            {
-                                <tr>
-                                    <td>@sub.EventType</td>
-                                    <td>
-                                        <span class="badge @(sub.IsSubscribed ? "bg-success" : "bg-secondary")">
-                                            @(sub.IsSubscribed ? "Active" : "Inactive")
-                                        </span>
-                                    </td>
-                                    <td>@sub.CreatedAt.ToString("MMM dd, yyyy")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+    <!-- Admin Actions row -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;">
+
+        <!-- Admin Role -->
+        <div class="admin-panel">
+            <div class="admin-panel-header">🛡 ADMIN ROLE</div>
+            <div class="admin-panel-body">
+                @if (ViewBag.IsAdmin == true)
+                {
+                    <div class="status-badge admin-badge" style="display:block;text-align:center;margin-bottom:1rem;">ADMIN ACCESS GRANTED</div>
+                    using (Html.BeginForm("RemoveAdmin", "Admin", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("id", Model.User.Id)
+                        <button type="submit"
+                                style="width:100%;font-family:var(--font-hud);font-size:0.75rem;font-weight:700;letter-spacing:0.1em;padding:0.5rem;background:rgba(216,64,64,0.1);border:1px solid rgba(216,64,64,0.35);color:#e88080;border-radius:2px;cursor:pointer;transition:all 0.2s;">
+                            REMOVE ADMIN ACCESS
+                        </button>
+                    }
+                }
+                else
+                {
+                    <div class="status-badge user-badge" style="display:block;text-align:center;margin-bottom:1rem;">STANDARD USER</div>
+                    using (Html.BeginForm("MakeAdmin", "Admin", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("id", Model.User.Id)
+                        <button type="submit"
+                                style="width:100%;font-family:var(--font-hud);font-size:0.75rem;font-weight:700;letter-spacing:0.1em;padding:0.5rem;background:rgba(64,216,128,0.08);border:1px solid rgba(64,216,128,0.3);color:var(--green);border-radius:2px;cursor:pointer;transition:all 0.2s;">
+                            GRANT ADMIN ACCESS
+                        </button>
+                    }
+                }
             </div>
         </div>
-    }
+
+        <!-- Email Verification -->
+        <div class="admin-panel">
+            <div class="admin-panel-header">✉ EMAIL VERIFICATION</div>
+            <div class="admin-panel-body">
+                @if (Model.User.EmailConfirmed)
+                {
+                    <div class="status-badge verified-badge" style="display:block;text-align:center;margin-bottom:1rem;">EMAIL VERIFIED</div>
+                    using (Html.BeginForm("UnconfirmEmail", "Admin", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("id", Model.User.Id)
+                        <button type="submit"
+                                style="width:100%;font-family:var(--font-hud);font-size:0.75rem;font-weight:700;letter-spacing:0.1em;padding:0.5rem;background:rgba(200,168,75,0.08);border:1px solid var(--gold-dim);color:var(--gold);border-radius:2px;cursor:pointer;transition:all 0.2s;">
+                            REMOVE VERIFICATION
+                        </button>
+                    }
+                }
+                else
+                {
+                    <div class="status-badge unverified-badge" style="display:block;text-align:center;margin-bottom:1rem;">NOT VERIFIED</div>
+                    using (Html.BeginForm("ConfirmEmail", "Admin", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("id", Model.User.Id)
+                        <button type="submit"
+                                style="width:100%;font-family:var(--font-hud);font-size:0.75rem;font-weight:700;letter-spacing:0.1em;padding:0.5rem;background:var(--accent-glow);border:1px solid var(--accent-dim);color:var(--accent);border-radius:2px;cursor:pointer;transition:all 0.2s;">
+                            FORCE VERIFY EMAIL
+                        </button>
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- Profile Picture Moderation -->
+        <div class="admin-panel">
+            <div class="admin-panel-header">🖼 PROFILE PICTURE</div>
+            <div class="admin-panel-body">
+                @if (Model.UserProfile != null && !string.IsNullOrEmpty(Model.UserProfile.ProfilePictureUrl))
+                {
+                    <div style="text-align:center;margin-bottom:0.75rem;">
+                        <img src="@Model.UserProfile.ProfilePictureUrl" alt="Profile"
+                             style="max-width:100px;border:1px solid var(--border);border-radius:2px;" />
+                    </div>
+                    <p style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);margin-bottom:0.75rem;line-height:1.5;">
+                        Remove if it violates community rules or contains inappropriate content.
+                    </p>
+                    using (Html.BeginForm("DeleteProfilePicture", "Admin", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("id", Model.User.Id)
+                        <button type="submit"
+                                onclick="return confirm('Remove this profile picture?');"
+                                style="width:100%;font-family:var(--font-hud);font-size:0.75rem;font-weight:700;letter-spacing:0.1em;padding:0.5rem;background:rgba(216,64,64,0.1);border:1px solid rgba(216,64,64,0.35);color:#e88080;border-radius:2px;cursor:pointer;transition:all 0.2s;">
+                            REMOVE PICTURE
+                        </button>
+                    }
+                }
+                else
+                {
+                    <div class="status-badge user-badge" style="display:block;text-align:center;">NO PICTURE UPLOADED</div>
+                }
+            </div>
+        </div>
+
+    </div>
 </div>
-
-<div class="admin-management-section mt-4">
-
-    <!-- Admin Role Card -->
-    <div class="card admin-card mb-4">
-        <div class="card-body">
-
-            <h4 class="section-title">
-                <i class="fas fa-shield-alt"></i>
-                Admin Role
-            </h4>
-
-            @if (ViewBag.IsAdmin == true)
-            {
-                <div class="status-badge admin-badge">
-                    ADMIN ACCESS GRANTED
-                </div>
-
-                using (Html.BeginForm("RemoveAdmin", "Admin", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.Hidden("id", Model.User.Id)
-
-                    <button type="submit" class="btn btn-danger admin-btn mt-3">
-                        Remove Admin Access
-                    </button>
-                }
-            }
-            else
-            {
-                <div class="status-badge user-badge">
-                    STANDARD USER
-                </div>
-
-                using (Html.BeginForm("MakeAdmin", "Admin", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.Hidden("id", Model.User.Id)
-
-                    <button type="submit" class="btn btn-success admin-btn mt-3">
-                        Grant Admin Access
-                    </button>
-                }
-            }
-
-        </div>
-    </div>
-
-    <!-- Email Verification Card -->
-    <div class="card admin-card">
-        <div class="card-body">
-
-            <h4 class="section-title">
-                <i class="fas fa-envelope-check"></i>
-                Email Verification
-            </h4>
-
-            @if (Model.User.EmailConfirmed)
-            {
-                <div class="status-badge verified-badge">
-                    EMAIL VERIFIED
-                </div>
-
-                using (Html.BeginForm("UnconfirmEmail", "Admin", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.Hidden("id", Model.User.Id)
-
-                    <button type="submit" class="btn btn-warning admin-btn mt-3">
-                        Remove Verification
-                    </button>
-                }
-            }
-            else
-            {
-                <div class="status-badge unverified-badge">
-                    EMAIL NOT VERIFIED
-                </div>
-
-                using (Html.BeginForm("ConfirmEmail", "Admin", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.Hidden("id", Model.User.Id)
-
-                    <button type="submit" class="btn btn-primary admin-btn mt-3">
-                        Force Verify Email
-                    </button>
-                }
-            }
-
-        </div>
-    </div>
-
-    <div class="card admin-card mt-4">
-        <div class="card-body">
-            <h4 class="section-title">
-                <i class="fas fa-image"></i>
-                Profile Picture Moderation
-            </h4>
-
-            @if (Model.UserProfile != null && !string.IsNullOrEmpty(Model.UserProfile.ProfilePictureUrl))
-            {
-                <p class="text-muted mt-3">
-                    Remove this image if it violates rules or contains inappropriate content.
-                </p>
-
-                using (Html.BeginForm("DeleteProfilePicture", "Admin", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.Hidden("id", Model.User.Id)
-
-                    <button type="submit"
-                            class="btn btn-danger admin-btn mt-3"
-                            onclick="return confirm('Are you sure you want to remove this profile picture?');">
-
-                        Remove Profile Picture
-                    </button>
-                }
-            }
-            else
-            {
-                <div class="status-badge user-badge">
-                    NO PROFILE PICTURE UPLOADED
-                </div>
-            }
-        </div>
-    </div>
-
-</div>
-
-
 
 @functions {
     string FormatFileSize(long bytes)
@@ -316,11 +308,7 @@
         string[] sizes = { "B", "KB", "MB", "GB" };
         double len = bytes;
         int order = 0;
-        while (len >= 1024 && order < sizes.Length - 1)
-        {
-            order++;
-            len = len / 1024;
-        }
+        while (len >= 1024 && order < sizes.Length - 1) { order++; len /= 1024; }
         return $"{len:0.##} {sizes[order]}";
     }
 }

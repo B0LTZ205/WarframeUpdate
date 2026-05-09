@@ -1,115 +1,99 @@
 ﻿@model ManageProfileViewModel
-
 @{
     ViewBag.Title = "My Account Settings";
 }
 
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <h2 class="mb-4">⚙️ Account Settings</h2>
+<div class="manage-wrap">
+    <h2 class="manage-page-title">⚙ ACCOUNT SETTINGS</h2>
 
-            @if (!string.IsNullOrEmpty(ViewBag.StatusMessage))
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @ViewBag.StatusMessage
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    @if (!string.IsNullOrEmpty(ViewBag.StatusMessage))
+    {
+        <div style="padding:0.65rem 1rem;background:rgba(64,216,128,0.08);border:1px solid rgba(64,216,128,0.3);border-radius:2px;font-family:var(--font-mono);font-size:0.75rem;color:var(--green);margin-bottom:1rem;">
+            ✓ @ViewBag.StatusMessage
+        </div>
+    }
+
+    <!-- Profile -->
+    <div class="manage-card">
+        <div class="manage-card-header accent">
+            👤 PROFILE INFORMATION
+            <a href="@Url.Action("UpdateProfile", "Manage")" class="nav-link" style="margin-left:auto;padding:0.2rem 0.6rem;font-size:0.65rem;">✏ EDIT</a>
+        </div>
+        <div class="manage-card-body">
+            <div style="display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap;">
+                <div style="text-align:center;flex-shrink:0;">
+                    @if (Model.UserProfile != null && !string.IsNullOrEmpty(Model.UserProfile.ProfilePictureUrl))
+                    {
+                        <img src="@Model.UserProfile.ProfilePictureUrl" alt="Profile" class="profile-avatar" />
+                    }
+                    else
+                    {
+                        <div class="profile-avatar-placeholder"><i class="fas fa-user"></i></div>
+                    }
+                    <a href="@Url.Action("UpdateProfile", "Manage")" style="font-family:var(--font-mono);font-size:0.6rem;color:var(--accent);text-decoration:none;">UPLOAD PHOTO</a>
                 </div>
-            }
-
-            <!-- Profile Section -->
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">👤 Profile Information</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <!-- Profile Picture -->
-                        <div class="col-md-3 text-center">
-                            <div class="profile-picture-container mb-3">
-                                @if (Model.UserProfile != null && !string.IsNullOrEmpty(Model.UserProfile.ProfilePictureUrl))
-                                {
-                                    <img src="@Model.UserProfile.ProfilePictureUrl" 
-                                         alt="Profile Picture" 
-                                         class="img-thumbnail rounded-circle" 
-                                         style="width: 150px; height: 150px; object-fit: cover;" />
-                                }
-                                else
-                                {
-                                    <div class="img-thumbnail rounded-circle d-flex align-items-center justify-content-center" 
-                                         style="width: 150px; height: 150px; background-color: #e9ecef;">
-                                        <i class="fas fa-user fa-3x text-secondary"></i>
-                                    </div>
-                                }
-                            </div>
-                            <a href="@Url.Action("UpdateProfile", "Manage")" class="btn btn-sm btn-primary">
-                                <i class="fas fa-camera"></i> Upload Picture
-                            </a>
-                        </div>
-
-                        <!-- User Info -->
-                        <div class="col-md-9">
-                            <p>
-                                <strong>Email:</strong> @Model.User.Email
-                                <span class="badge @(Model.User.EmailConfirmed ? "bg-success" : "bg-warning")">
-                                    @(Model.User.EmailConfirmed ? "✓ Verified" : "Unverified")
-                                </span>
-                            </p>
-                            <p>
-                                <strong>Username:</strong> @Model.User.UserName
-                            </p>
-
-                            @if (Model.UserProfile != null)
+                <div style="flex:1;min-width:200px;">
+                    <div class="profile-field">
+                        <span class="profile-field-label">EMAIL</span>
+                        <span class="profile-field-value">
+                            @Model.User.Email
+                            @if (Model.User.EmailConfirmed)
                             {
-                                <p>
-                                    <strong>First Name:</strong> @(Model.UserProfile.FirstName ?? "Not set")
-                                </p>
-                                <p>
-                                    <strong>Last Name:</strong> @(Model.UserProfile.LastName ?? "Not set")
-                                </p>
-                                <p>
-                                    <strong>Phone:</strong> @(Model.UserProfile.PhoneNumber ?? "Not set")
-                                </p>
-                                <p>
-                                    <strong>Member Since:</strong> @Model.UserProfile.CreatedAt.ToString("MMM dd, yyyy")
-                                </p>
+                                <span style="font-family:var(--font-mono);font-size:0.6rem;color:var(--green);margin-left:0.4rem;">✓ VERIFIED</span>
                             }
-
-                            <a href="@Url.Action("UpdateProfile", "Manage")" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-edit"></i> Edit Profile
-                            </a>
+                            else
+                            {
+                                <span style="font-family:var(--font-mono);font-size:0.6rem;color:var(--gold);margin-left:0.4rem;">UNVERIFIED</span>
+                            }
+                        </span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-field-label">USERNAME</span>
+                        <span class="profile-field-value">@Model.User.UserName</span>
+                    </div>
+                    @if (Model.UserProfile != null)
+                    {
+                        <div class="profile-field">
+                            <span class="profile-field-label">FIRST NAME</span>
+                            <span class="profile-field-value">@(Model.UserProfile.FirstName ?? "—")</span>
                         </div>
-                    </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">LAST NAME</span>
+                            <span class="profile-field-value">@(Model.UserProfile.LastName ?? "—")</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">PHONE</span>
+                            <span class="profile-field-value">@(Model.UserProfile.PhoneNumber ?? "—")</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-field-label">MEMBER SINCE</span>
+                            <span class="profile-field-value" style="font-family:var(--font-mono);font-size:0.75rem;">@Model.UserProfile.CreatedAt.ToString("MMM dd, yyyy")</span>
+                        </div>
+                    }
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Security Section -->
-            <div class="card mb-4">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">🔒 Security Settings</h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <a href="@Url.Action("ChangePassword", "Manage")" class="list-group-item list-group-item-action">
-                            <i class="fas fa-key"></i> Change Password
-                            <span class="float-end"><i class="fas fa-chevron-right"></i></span>
-                        </a>
-                    </div>
-                </div>
-            </div>
+    <!-- Security -->
+    <div class="manage-card">
+        <div class="manage-card-header gold">🔒 SECURITY SETTINGS</div>
+        <div style="padding:0;">
+            <a href="@Url.Action("ChangePassword", "Manage")" class="manage-action-link">
+                <span><i class="fas fa-key" style="margin-right:0.5rem;color:var(--gold);"></i> Change Password</span>
+                <i class="fas fa-chevron-right" style="font-size:0.6rem;"></i>
+            </a>
+        </div>
+    </div>
 
-            <!-- Preferences Section -->
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">📧 Notification Preferences</h5>
-                </div>
-                <div class="card-body">
-                    <p class="mb-3">Manage your notification settings for Warframe events.</p>
-                    <a href="@Url.Action("Index", "Preferences")" class="btn btn-info">
-                        <i class="fas fa-cog"></i> Manage Preferences
-                    </a>
-                </div>
-            </div>
+    <!-- Preferences -->
+    <div class="manage-card">
+        <div class="manage-card-header info">📧 NOTIFICATION PREFERENCES</div>
+        <div class="manage-card-body">
+            <p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.85rem;">Manage your notification settings for Warframe events.</p>
+            <a href="@Url.Action("Index", "Preferences")" class="btn-accent btn" style="font-size:0.75rem;padding:0.5rem 1rem;">
+                <i class="fas fa-cog" style="margin-right:0.4rem;"></i> MANAGE PREFERENCES
+            </a>
         </div>
     </div>
 </div>

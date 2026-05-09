@@ -9,7 +9,7 @@
     {
         var cetusState = Model.CetusCycle.IsDay ? "DAY" : "NIGHT";
         <div class="cycle-pill @(Model.CetusCycle.IsDay ? "day" : "night")">
-            <span class="cycle-icon">@(Model.CetusCycle.IsDay ? "☀" : "☽")</span>
+            <span class="cycle-icon">@Html.Raw(Model.CetusCycle.IsDay ? "<i class=\"fas fa-sun\"></i>" : "<i class=\"fas fa-moon\"></i>")</span>
             <span class="cycle-label">CETUS</span>
             <span class="cycle-state">@cetusState</span>
             <span class="cycle-timer" data-expiry="@Model.CetusCycle.Expiry">--</span>
@@ -19,14 +19,14 @@
     {
         var vallisState = Model.VallisCycle.IsWarm ? "WARM" : "COLD";
         <div class="cycle-pill @(Model.VallisCycle.IsWarm ? "warm" : "cold")">
-            <span class="cycle-icon">@(Model.VallisCycle.IsWarm ? "🌡" : "❄")</span>
+            <span class="cycle-icon">@Html.Raw(Model.VallisCycle.IsWarm ? "<i class=\"fas fa-temperature-high\"></i>" : "<i class=\"fas fa-snowflake\"></i>")</span>
             <span class="cycle-label">ORBUS VALLIS</span>
             <span class="cycle-state">@vallisState</span>
             <span class="cycle-timer" data-expiry="@Model.VallisCycle.Expiry">--</span>
         </div>
     }
     <div class="cycle-pill neutral">
-        <span class="cycle-icon">🕐</span>
+        <span class="cycle-icon"><i class="fas fa-clock"></i></span>
         <span class="cycle-label">SERVER TIME</span>
         <span class="cycle-state" id="server-time">--:--:--</span>
     </div>
@@ -38,7 +38,7 @@
     <section id="sortie" class="card card--sortie">
         <div class="card-header">
             <div class="card-title-block">
-                <span class="card-icon">⚔</span>
+                <span class="card-icon"><i class="fas fa-sword"></i></span>
                 <div>
                     <h2 class="card-title">DAILY SORTIE</h2>
                     @if (Model.Sortie != null)
@@ -84,7 +84,7 @@
     <section id="voidtrader" class="card card--trader">
         <div class="card-header">
             <div class="card-title-block">
-                <span class="card-icon">💎</span>
+                <span class="card-icon"><i class="fas fa-gem"></i></span>
                 <div>
                     <h2 class="card-title">BARO KI'TEER</h2>
                     @if (Model.VoidTrader != null)
@@ -147,12 +147,12 @@
     </section>
 
     @Html.AntiForgeryToken()
-    
+
     <!-- ═══ NIGHTWAVE ═══ -->
     <section id="nightwave" class="card card--nightwave">
         <div class="card-header">
             <div class="card-title-block">
-                <span class="card-icon">📻</span>
+                <span class="card-icon"><i class="fas fa-radio"></i></span>
                 <div>
                     <h2 class="card-title">NIGHTWAVE</h2>
                     @if (Model.Nightwave != null)
@@ -180,7 +180,7 @@
                                     <div class="challenge-title">@ch.Title</div>
                                     <div class="challenge-desc">@ch.Desc</div>
                                 </div>
-                                <div class="challenge-rep">+@ch.Reputation<br/><small>REP</small></div>
+                                <div class="challenge-rep">+@ch.Reputation<br /><small>REP</small></div>
                             </div>
                         }
                     </div>
@@ -197,7 +197,7 @@
                                     <div class="challenge-title">@ch.Title</div>
                                     <div class="challenge-desc">@ch.Desc</div>
                                 </div>
-                                <div class="challenge-rep">+@ch.Reputation<br/><small>REP</small></div>
+                                <div class="challenge-rep">+@ch.Reputation<br /><small>REP</small></div>
                             </div>
                         }
                     </div>
@@ -214,7 +214,7 @@
                                     <div class="challenge-title">@ch.Title</div>
                                     <div class="challenge-desc">@ch.Desc</div>
                                 </div>
-                                <div class="challenge-rep">+@ch.Reputation<br/><small>REP</small></div>
+                                <div class="challenge-rep">+@ch.Reputation<br /><small>REP</small></div>
                             </div>
                         }
                     </div>
@@ -231,7 +231,7 @@
     <section id="fissures" class="card card--fissures">
         <div class="card-header">
             <div class="card-title-block">
-                <span class="card-icon">◈</span>
+                <span class="card-icon"><i class="fas fa-circle-nodes"></i></span>
                 <div>
                     <h2 class="card-title">VOID FISSURES</h2>
                     <span class="card-subtitle">ACTIVE TEARS</span>
@@ -244,7 +244,7 @@
                 // Show all fissures, not just active ones
                 var fissuresToShow = Model.Fissures.OrderBy(f => f.TierNum).ToList();
                 var itemsToShowInitially = 5;
-                
+
                 if (fissuresToShow != null && fissuresToShow.Count > 0)
                 {
                     <div class="fissures-container">
@@ -253,7 +253,7 @@
                             var fissure = fissuresToShow[i];
                             var tierClass = (fissure.Tier ?? "lith").ToLower();
                             var hiddenClass = i >= itemsToShowInitially ? "fissure-hidden" : "";
-                            
+
                             <div class="fissure-row @hiddenClass">
                                 <div class="fissure-tier">
                                     <span class="tier-badge @tierClass">@((fissure.Tier ?? "LITH").ToUpper())</span>
@@ -268,7 +268,7 @@
                             </div>
                         }
                     </div>
-                    
+
                     if (fissuresToShow.Count > itemsToShowInitially)
                     {
                         <button type="button" class="btn-show-more" id="fissureShowMore" data-total="@fissuresToShow.Count" data-shown="@itemsToShowInitially" onclick="return false;">
@@ -292,7 +292,7 @@
     <section id="deals" class="card card--deals">
         <div class="card-header">
             <div class="card-title-block">
-                <span class="card-icon">🏪</span>
+                <span class="card-icon"><i class="fas fa-store"></i></span>
                 <div>
                     <h2 class="card-title">DARVO DEALS</h2>
                     <span class="card-subtitle">DAILY OFFER</span>
@@ -339,7 +339,7 @@
     <section id="invasions" class="card card--invasions">
         <div class="card-header">
             <div class="card-title-block">
-                <span class="card-icon">⚠</span>
+                <span class="card-icon"><i class="fas fa-triangle-exclamation"></i></span>
                 <div>
                     <h2 class="card-title">INVASIONS</h2>
                     <span class="card-subtitle">ACTIVE CONFLICTS</span>

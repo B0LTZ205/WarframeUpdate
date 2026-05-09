@@ -1,41 +1,40 @@
 ﻿@model IEnumerable<WarframeUpdate.Models.Notification>
-
 @{
     ViewBag.Title = "Notifications";
 }
 
-<div class="container mt-4">
-    <h2>Notifications</h2>
-
-    @using (Html.BeginForm("MarkAllAsRead", "Notifications", FormMethod.Post))
-    {
-        @Html.AntiForgeryToken()
-        <button class="btn btn-primary mb-3" type="submit">Mark All As Read</button>
-    }
+<div class="notifications-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem;">
+        <h2 class="manage-page-title" style="margin:0;">🔔 NOTIFICATIONS</h2>
+        @using (Html.BeginForm("MarkAllAsRead", "Notifications", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-show-more" style="width:auto;padding:0.4rem 1rem;margin:0;">MARK ALL AS READ</button>
+        }
+    </div>
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info">No notifications yet.</div>
+        <div class="error-state" style="background:var(--bg-card);border:1px solid var(--border);border-radius:3px;">
+            No notifications yet.
+        </div>
     }
     else
     {
         foreach (var item in Model)
         {
-            <div class="card mb-3 @(item.IsRead ? "" : "border-info")">
-                <div class="card-body">
-                    <h5>@item.Title</h5>
-                    <p>@item.Message</p>
-                    <small>@item.CreatedAt.ToLocalTime()</small>
-
+            <div class="notification-item @(item.IsRead ? "" : "unread")">
+                <div class="notification-title">@item.Title</div>
+                <div class="notification-msg">@item.Message</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+                    <span class="notification-time">@item.CreatedAt.ToLocalTime()</span>
                     @if (!item.IsRead)
                     {
                         using (Html.BeginForm("MarkAsRead", "Notifications", FormMethod.Post))
                         {
                             @Html.AntiForgeryToken()
                             @Html.Hidden("id", item.Id)
-                            <button class="btn btn-sm btn-outline-light mt-2" type="submit">
-                                Mark as Read
-                            </button>
+                            <button type="submit" class="btn-show-more" style="width:auto;padding:0.25rem 0.75rem;margin:0;font-size:0.6rem;">MARK AS READ</button>
                         }
                     }
                 </div>

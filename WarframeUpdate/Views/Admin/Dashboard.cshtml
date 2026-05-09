@@ -1,111 +1,84 @@
 ﻿@model WarframeUpdate.Controllers.AdminDashboardViewModel
-
 @{
     ViewBag.Title = "Admin Dashboard";
 }
 
-<div class="container-fluid mt-4">
-    <h2 class="mb-4">📊 Admin Dashboard</h2>
+<div class="admin-dashboard-wrap">
+    <h2 class="admin-page-title">⚙ ADMIN DASHBOARD</h2>
 
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Total Users</h5>
-                    <h2>@Model.TotalUsers</h2>
-                    <a href="@Url.Action("Users", "Admin")" class="btn btn-light btn-sm mt-2">View Users</a>
-                </div>
-            </div>
+    <div class="stat-cards-row">
+        <div class="stat-card stat-users">
+            <div class="stat-label">TOTAL USERS</div>
+            <div class="stat-value">@Model.TotalUsers</div>
+            <a href="@Url.Action("Users", "Admin")" class="stat-sub" style="color:var(--accent);text-decoration:none;">View Users →</a>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Total Files</h5>
-                    <h2>@Model.TotalFileUploads</h2>
-                    <small>Across all users</small>
-                </div>
-            </div>
+        <div class="stat-card stat-files">
+            <div class="stat-label">TOTAL FILES</div>
+            <div class="stat-value">@Model.TotalFileUploads</div>
+            <div class="stat-sub">Across all users</div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Event Subscriptions</h5>
-                    <h2>@Model.TotalEventSubscriptions</h2>
-                    <small>Active subscriptions</small>
-                </div>
-            </div>
+        <div class="stat-card stat-subs">
+            <div class="stat-label">SUBSCRIPTIONS</div>
+            <div class="stat-value">@Model.TotalEventSubscriptions</div>
+            <div class="stat-sub">Active subscriptions</div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Recent Activity</h5>
-                    <h2>@Model.RecentActivityLogs.Count</h2>
-                    <small>Last 10 actions</small>
-                </div>
-            </div>
+        <div class="stat-card stat-activity">
+            <div class="stat-label">RECENT ACTIVITY</div>
+            <div class="stat-value">@Model.RecentActivityLogs.Count</div>
+            <div class="stat-sub">Last 10 actions</div>
         </div>
     </div>
 
-    <!-- Recent Activity -->
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">📋 Recent Activity Log</h5>
-                </div>
-                <div class="card-body">
-                    @if (Model.RecentActivityLogs.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Admin</th>
-                                        <th>Action</th>
-                                        <th>Details</th>
-                                        <th>Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var log in Model.RecentActivityLogs)
-                                    {
-                                        <tr>
-                                            <td>@log.AdminUser.UserName</td>
-                                            <td><strong>@log.Action</strong></td>
-                                            <td>@log.Details</td>
-                                            <td>@log.CreatedAt.ToString("MMM dd, HH:mm")</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted">No recent activity.</p>
-                    }
-                </div>
+    <div class="admin-grid">
+        <div class="admin-panel">
+            <div class="admin-panel-header">📋 RECENT ACTIVITY LOG</div>
+            <div class="admin-panel-body" style="padding:0;">
+                @if (Model.RecentActivityLogs.Any())
+                {
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ADMIN</th>
+                                <th>ACTION</th>
+                                <th>DETAILS</th>
+                                <th>TIME</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in Model.RecentActivityLogs)
+                            {
+                                <tr>
+                                    <td>@log.AdminUser.UserName</td>
+                                    <td><strong>@log.Action</strong></td>
+                                    <td>@log.Details</td>
+                                    <td><small>@log.CreatedAt.ToString("MMM dd, HH:mm")</small></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="error-state">No recent activity.</div>
+                }
             </div>
         </div>
 
-        <!-- Quick Links -->
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">⚙️ Quick Actions</h5>
-                </div>
-                <div class="list-group list-group-flush">
-                    <a href="@Url.Action("Users", "Admin")" class="list-group-item list-group-item-action">
-                        <i class="fas fa-users"></i> Manage Users
-                    </a>
-                    <a href="@Url.Action("ActivityLogs", "Admin")" class="list-group-item list-group-item-action">
-                        <i class="fas fa-history"></i> View All Logs
-                    </a>
-                    <a href="@Url.Action("Index", "Home")" class="list-group-item list-group-item-action">
-                        <i class="fas fa-home"></i> Back to Home
-                    </a>
-                </div>
+        <div class="admin-panel">
+            <div class="admin-panel-header">⚡ QUICK ACTIONS</div>
+            <div style="padding:0;">
+                <a href="@Url.Action("Users", "Admin")" class="admin-quick-link">
+                    <span><i class="fas fa-users"></i> Manage Users</span>
+                    <i class="fas fa-chevron-right" style="font-size:0.6rem;"></i>
+                </a>
+                <a href="@Url.Action("ActivityLogs", "Admin")" class="admin-quick-link">
+                    <span><i class="fas fa-history"></i> View All Logs</span>
+                    <i class="fas fa-chevron-right" style="font-size:0.6rem;"></i>
+                </a>
+                <a href="@Url.Action("Index", "Home")" class="admin-quick-link">
+                    <span><i class="fas fa-home"></i> Back to Home</span>
+                    <i class="fas fa-chevron-right" style="font-size:0.6rem;"></i>
+                </a>
             </div>
         </div>
     </div>
