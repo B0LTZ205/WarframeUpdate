@@ -39,21 +39,24 @@ namespace WarframeTracker.Services
 
             await Task.WhenAll(sortieTask, nightwaveTask, fissuresTask, voidTraderTask, dailyDealsTask, invasionsTask, cetusCycleTask, vallisCycleTask);
 
-            var sortie = await sortieTask;
-            var nightwave = await nightwaveTask;
-            var fissures = await fissuresTask ?? new List<FissureModel>();
-            fissures = fissures
+            var (sortie, sortieStale) = await sortieTask;
+            var (nightwave, nightwaveStale) = await nightwaveTask;
+            var (fissuresRaw, fissuresStale) = await fissuresTask;
+            var (voidTrader, traderStale) = await voidTraderTask;
+            var (dailyDeals, dealsStale) = await dailyDealsTask;
+            var (invasions, invasionsStale) = await invasionsTask;
+            var (cetusCycle, cetusStale) = await cetusCycleTask;
+            var (vallisCycle, vallisStale) = await vallisCycleTask;
+
+            var fissures = (fissuresRaw ?? new List<FissureModel>())
                 .Where(f => f.Expiry > DateTime.UtcNow)
                 .OrderBy(f => f.Expiry)
                 .ToList();
-            var voidTrader = await voidTraderTask;
-            var dailyDeals = await dailyDealsTask ?? new List<DailyDealModel>();
-            var invasions = await invasionsTask ?? new List<InvasionModel>();
-            var cetusCycle = await cetusCycleTask;
-            var vallisCycle = await vallisCycleTask;
 
-            System.Diagnostics.Debug.WriteLine($"[WarframeService] Dashboard loaded - Fissures count: {fissures?.Count ?? 0}");
+            bool apiOffline = sortieStale || nightwaveStale || fissuresStale || traderStale
+                           || dealsStale || invasionsStale || cetusStale || vallisStale;
 
+            System.Diagnostics.Debug.WriteLine($"[WarframeService] Dashboard loaded - ApiOffline: {apiOffline}, Fissures: {fissures.Count}");
 
             return new DashboardViewModel
             {
@@ -61,22 +64,28 @@ namespace WarframeTracker.Services
                 Nightwave = nightwave,
                 Fissures = fissures,
                 VoidTrader = voidTrader,
-                DailyDeals = dailyDeals,
-                Invasions = invasions,
+                DailyDeals = dailyDeals ?? new List<DailyDealModel>(),
+                Invasions = invasions ?? new List<InvasionModel>(),
                 CetusCycle = cetusCycle,
                 VallisCycle = vallisCycle,
+                ApiOffline = apiOffline,
             };
-
         }
 
-        private static async Task<T> FetchAsync<T>(string endpoint, TimeSpan cacheDuration) where T : class
+
+        private static async Task<(T Data, bool WasStale)> FetchAsync<T>(string endpoint, TimeSpan cacheDuration) where T : class
         {
+            T stale = null;
             lock (_cache)
             {
-                if (_cache.TryGetValue(endpoint, out var cached) && cached.Expiry > DateTime.UtcNow)
+                if (_cache.TryGetValue(endpoint, out var cached))
                 {
-                    System.Diagnostics.Debug.WriteLine($"[WarframeService] Returning cached data for {endpoint}");
-                    return (T)cached.Data;
+                    if (cached.Expiry > DateTime.UtcNow)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[WarframeService] Returning cached data for {endpoint}");
+                        return ((T)cached.Data, false);
+                    }
+                    stale = (T)cached.Data;
                 }
             }
 
@@ -84,40 +93,30 @@ namespace WarframeTracker.Services
             {
                 var url = $"{endpoint}?language=en";
                 System.Diagnostics.Debug.WriteLine($"[WarframeService] Fetching {url}");
-                
+
                 var json = await _client.GetStringAsync(url);
-                
-                // Debug log raw JSON for invasions
+
                 if (endpoint == "pc/invasions")
-                {
                     System.Diagnostics.Debug.WriteLine($"[WarframeService] Raw invasions JSON: {json.Substring(0, Math.Min(500, json.Length))}...");
-                }
-                
+
                 var data = JsonConvert.DeserializeObject<T>(json);
-                
+
                 lock (_cache)
                 {
                     _cache[endpoint] = (data, DateTime.UtcNow.Add(cacheDuration));
                 }
-                
+
                 System.Diagnostics.Debug.WriteLine($"[WarframeService] Successfully fetched {endpoint}");
-                return data;
-            }
-            catch (HttpRequestException httpEx)
-            {
-                System.Diagnostics.Debug.WriteLine($"[WarframeService] HTTP Error fetching {endpoint}: {httpEx.Message}");
-                return null;
-            }
-            catch (JsonSerializationException jsonEx)
-            {
-                System.Diagnostics.Debug.WriteLine($"[WarframeService] JSON Parse Error for {endpoint}: {jsonEx.Message}");
-                return null;
+                return (data, false);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[WarframeService] Unexpected error fetching {endpoint}: {ex.Message}");
-                return null;
+                System.Diagnostics.Debug.WriteLine($"[WarframeService] Error fetching {endpoint}: {ex.Message}");
+                if (stale != null)
+                    System.Diagnostics.Debug.WriteLine($"[WarframeService] Falling back to stale cache for {endpoint}");
+                return (stale, stale != null);
             }
         }
+
     }
 }

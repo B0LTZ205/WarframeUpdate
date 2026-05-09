@@ -283,5 +283,7 @@ namespace WarframeTracker.Models
         public List<InvasionModel> Invasions { get; set; }
         public CetusCycleModel CetusCycle { get; set; }
         public VallisCycleModel VallisCycle { get; set; }
+        public bool ApiOffline { get; set; }
+
     }
 }

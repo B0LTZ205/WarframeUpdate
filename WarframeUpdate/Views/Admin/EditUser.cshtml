@@ -4,37 +4,52 @@
     ViewBag.Title = "Edit User";
 }
 
-<div class="container mt-4">
-    <h2>Edit User</h2>
+<div class="auth-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7 col-sm-9">
+                <div class="card auth-card">
+                    <div class="card-header auth-card-header">
+                        <div class="text-center">
+                            <div class="auth-icon">✎</div>
+                            <h2 class="auth-title">EDIT TENNO</h2>
+                            <p class="auth-subtitle">MODIFY USER RECORD</p>
+                        </div>
+                    </div>
 
-    @using (Html.BeginForm("EditUser", "Admin", FormMethod.Post))
-    {
-        @Html.AntiForgeryToken()
-        @Html.HiddenFor(m => m.Id)
+                    <div class="card-body auth-card-body">
+                        @using (Html.BeginForm("EditUser", "Admin", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(m => m.Id)
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger alert alert-danger mb-3" })
 
-        <div class="card admin-card p-4">
-            <div class="form-group mb-3">
-                @Html.LabelFor(m => m.UserName)
-                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.UserName, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="mb-4">
+                                @Html.LabelFor(m => m.Email, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email" })
+                                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="mb-4" style="display:flex; align-items:center; gap:0.65rem; padding:0.65rem 0.85rem; background:var(--bg-card-alt); border:1px solid var(--border); border-radius:2px;">
+                                @Html.CheckBoxFor(m => m.EmailConfirmed, new { @class = "form-check-input", style = "width:1rem; height:1rem; margin:0; flex-shrink:0;" })
+                                <div>
+                                    <span style="font-family:var(--font-hud); font-size:0.75rem; font-weight:600; letter-spacing:0.12em; color:var(--text-dim); display:block;">EMAIL CONFIRMED</span>
+                                    <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-muted);">Mark account email as verified</span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-accent btn-lg w-100 mb-2">SAVE CHANGES</button>
+                            @Html.ActionLink("← CANCEL", "UserDetails", "Admin", new { id = Model.Id }, new { @class = "btn btn-cancel-hud w-100 text-center" })
+                        }
+                    </div>
+                </div>
             </div>
-
-            <div class="form-group mb-3">
-                @Html.LabelFor(m => m.Email)
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email" })
-                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
-            </div>
-
-            <div class="form-check mb-3">
-                @Html.CheckBoxFor(m => m.EmailConfirmed, new { @class = "form-check-input" })
-                @Html.LabelFor(m => m.EmailConfirmed, "Email Confirmed", new { @class = "form-check-label" })
-            </div>
-
-            <button type="submit" class="btn btn-primary">
-                Save Changes
-            </button>
-
-            @Html.ActionLink("Cancel", "UserDetails", "Admin", new { id = Model.Id }, new { @class = "btn btn-secondary ms-2" })
         </div>
-    }
+    </div>
 </div>

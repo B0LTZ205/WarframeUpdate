@@ -1,160 +1,190 @@
 ﻿@model PaginatedList<WarframeUpdate.Models.ApplicationUser>
+
 @{
     ViewBag.Title = "Manage Users";
 }
 
-<div class="admin-dashboard-wrap">
-    <h2 class="admin-page-title">👥 MANAGE USERS</h2>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="hud-banner hud-banner--success" id="hudBanner">
+        <span class="hud-banner__icon">✔</span>
+        <span class="hud-banner__text">@TempData["SuccessMessage"]</span>
+        <button class="hud-banner__close" onclick="this.closest('.hud-banner').remove()">✕</button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="hud-banner hud-banner--error" id="hudBanner">
+        <span class="hud-banner__icon">⚠</span>
+        <span class="hud-banner__text">@TempData["ErrorMessage"]</span>
+        <button class="hud-banner__close" onclick="this.closest('.hud-banner').remove()">✕</button>
+    </div>
+}
 
-    @if (!Model.Items.Any())
-    {
-        <div class="error-state" style="background:var(--bg-card);border:1px solid var(--border);border-radius:3px;">No users found.</div>
-    }
-    else
-    {
-        <div class="admin-panel" style="margin-bottom:1.25rem;">
-            <div class="admin-panel-header">USER ROSTER — @Model.Items.Count SHOWN</div>
-            <div style="overflow-x:auto;">
-                <table class="admin-table" style="min-width:700px;">
-                    <thead>
-                        <tr>
-                            <th>PROFILE</th>
-                            <th>USERNAME</th>
-                            <th>EMAIL</th>
-                            <th>PHONE</th>
-                            <th>JOINED</th>
-                            <th>STATUS</th>
-                            <th>ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var user in Model.Items)
+    <div class="dashboard" style="display:block; max-width:1200px;">
+        <div class="card" style="grid-column:span 12; padding:0;">
+            <div class="card-header">
+                <div class="card-title-block">
+                    <span class="card-icon">👥</span>
+                    <div>
+                        <h2 class="card-title">MANAGE USERS</h2>
+                        <span class="card-subtitle">TENNO REGISTRY</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body" style="padding:0;">
+                @if (!Model.Items.Any())
+                {
+                    <div class="error-state">NO USERS FOUND IN REGISTRY</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="hud-table">
+                            <thead>
+                                <tr>
+                                    <th>Profile</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Email Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in Model.Items)
+                                {
+                                    var userProfile = user.UserProfile;
+                                    <tr>
+                                        <td>
+                                            @if (userProfile != null && !string.IsNullOrEmpty(userProfile.ProfilePictureUrl))
+                                            {
+                                                <img src="@userProfile.ProfilePictureUrl"
+                                                     alt="@(userProfile.FirstName ?? user.UserName)"
+                                                     class="rounded-circle"
+                                                     style="width:38px; height:38px; object-fit:cover; border:1px solid var(--border);" />
+                                            }
+                                            else
+                                            {
+                                                <div style="width:38px; height:38px; border-radius:50%; background:var(--bg-card-alt); border:1px solid var(--border); display:inline-flex; align-items:center; justify-content:center; color:var(--text-muted);">
+                                                    <i class="fas fa-user" style="font-size:0.8rem;"></i>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (userProfile != null && !string.IsNullOrEmpty(userProfile.FirstName))
+                                            {
+                                                <span style="color:var(--text-primary); font-family:var(--font-hud); font-weight:600;">@userProfile.FirstName @userProfile.LastName</span><br />
+                                                <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-muted);">@user.UserName</span>
+                                            }
+                                            else
+                                            {
+                                                <span style="font-family:var(--font-hud);">@user.UserName</span>
+                                            }
+                                        </td>
+                                        <td style="color:var(--text-dim); font-size:0.82rem;">@user.Email</td>
+                                        <td style="color:var(--text-dim); font-size:0.82rem;">
+                                            @if (userProfile != null && !string.IsNullOrEmpty(userProfile.PhoneNumber))
+                                            {
+                                                @userProfile.PhoneNumber
+                                            }
+                                            else
+                                            {
+                                                <span style="color:var(--text-muted);">—</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (user.EmailConfirmed)
+                                            {
+                                                <span style="font-family:var(--font-mono); font-size:0.65rem; padding:0.2rem 0.5rem; background:rgba(64,216,128,0.1); border:1px solid rgba(64,216,128,0.3); color:var(--green); border-radius:2px;">✓ CONFIRMED</span>
+                                            }
+                                            else
+                                            {
+                                                <span style="font-family:var(--font-mono); font-size:0.65rem; padding:0.2rem 0.5rem; background:rgba(200,168,75,0.1); border:1px solid rgba(200,168,75,0.3); color:var(--gold); border-radius:2px;">PENDING</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+                                                <a href="@Url.Action("UserDetails", "Admin", new { id = user.Id })" class="btn btn-accent btn-sm" style="font-size:0.7rem; padding:0.3rem 0.65rem; letter-spacing:0.1em;">
+                                                    <i class="fas fa-eye"></i> VIEW
+                                                </a>
+                                                <button type="button" class="btn-danger-hud btn-sm"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                        data-user-id="@user.Id" data-user-name="@user.UserName"
+                                                        style="font-size:0.7rem; padding:0.3rem 0.65rem;">
+                                                    <i class="fas fa-trash"></i> DELETE
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div style="padding:1rem 1.25rem; border-top:1px solid var(--border); display:flex; justify-content:center; gap:0.25rem;">
+                        @if (Model.HasPreviousPage)
                         {
-                            var userProfile = user.UserProfile;
-                            <tr>
-                                <td>
-                                    @if (userProfile != null && !string.IsNullOrEmpty(userProfile.ProfilePictureUrl))
-                                    {
-                                        <img src="@userProfile.ProfilePictureUrl"
-                                             alt="@(userProfile.FirstName ?? user.UserName)"
-                                             style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid var(--border);" />
-                                    }
-                                    else
-                                    {
-                                        <div style="width:36px;height:36px;border-radius:50%;background:var(--bg-card-alt);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;color:var(--text-muted);">
-                                            <i class="fas fa-user" style="font-size:0.75rem;"></i>
-                                        </div>
-                                    }
-                                </td>
-                                <td>
-                                    @if (userProfile != null && !string.IsNullOrEmpty(userProfile.FirstName))
-                                    {
-                                        <strong style="color:var(--text-primary);font-family:var(--font-hud);">@userProfile.FirstName @userProfile.LastName</strong>
-                                        <br /><small>@user.UserName</small>
-                                    }
-                                    else
-                                    {
-                                        <span style="color:var(--text-primary);font-family:var(--font-hud);">@user.UserName</span>
-                                    }
-                                </td>
-                                <td style="font-family:var(--font-mono);font-size:0.72rem;">@user.Email</td>
-                                <td>
-                                    @if (userProfile != null && !string.IsNullOrEmpty(userProfile.PhoneNumber))
-                                    {
-                                        <span style="font-family:var(--font-mono);font-size:0.72rem;">@userProfile.PhoneNumber</span>
-                                    }
-                                    else
-                                    {
-                                        <span style="color:var(--text-muted);">—</span>
-                                    }
-                                </td>
-                                <td><small>@DateTime.Now.ToString("MMM dd, yyyy")</small></td>
-                                <td>
-                                    @if (user.EmailConfirmed)
-                                    {
-                                        <span style="font-family:var(--font-mono);font-size:0.6rem;padding:0.15rem 0.45rem;background:rgba(64,216,128,0.1);color:var(--green);border:1px solid rgba(64,216,128,0.3);border-radius:2px;">✓ VERIFIED</span>
-                                    }
-                                    else
-                                    {
-                                        <span style="font-family:var(--font-mono);font-size:0.6rem;padding:0.15rem 0.45rem;background:rgba(200,168,75,0.1);color:var(--gold);border:1px solid var(--gold-dim);border-radius:2px;">PENDING</span>
-                                    }
-                                </td>
-                                <td>
-                                    <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
-                                        <a href="@Url.Action("UserDetails", "Admin", new { id = user.Id })"
-                                           style="font-family:var(--font-hud);font-size:0.65rem;font-weight:700;letter-spacing:0.08em;padding:0.25rem 0.6rem;background:var(--accent-glow);border:1px solid var(--accent-dim);color:var(--accent);border-radius:2px;text-decoration:none;transition:all 0.2s;">
-                                            <i class="fas fa-eye" style="margin-right:0.3rem;"></i>VIEW
-                                        </a>
-                                        <button type="button"
-                                                style="font-family:var(--font-hud);font-size:0.65rem;font-weight:700;letter-spacing:0.08em;padding:0.25rem 0.6rem;background:rgba(216,64,64,0.1);border:1px solid rgba(216,64,64,0.3);color:#e88080;border-radius:2px;cursor:pointer;transition:all 0.2s;"
-                                                data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                                data-user-id="@user.Id" data-user-name="@user.UserName">
-                                            <i class="fas fa-trash" style="margin-right:0.3rem;"></i>DELETE
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                            <a href="@Url.Action("Users", "Admin", new { page = Model.PageIndex - 1 })"
+                               style="font-family:var(--font-hud); font-size:0.7rem; letter-spacing:0.1em; padding:0.35rem 0.75rem; border:1px solid var(--border); color:var(--text-dim); text-decoration:none; border-radius:2px;">← PREV</a>
                         }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        if (Model.TotalPages > 1)
-        {
-            <div style="display:flex;justify-content:center;gap:0.35rem;flex-wrap:wrap;">
-                @if (Model.HasPreviousPage)
-                {
-                    <a href="@Url.Action("Users", "Admin", new { page = Model.PageIndex - 1 })" class="admin-quick-link" style="padding:0.35rem 0.75rem;border:1px solid var(--border);border-radius:2px;font-size:0.65rem;">← PREV</a>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <a href="@Url.Action("Users", "Admin", new { page = i })"
+                               style="font-family:var(--font-mono); font-size:0.75rem; padding:0.35rem 0.65rem; border:1px solid @(i == Model.PageIndex ? "var(--accent-dim)" : "var(--border)"); background:@(i == Model.PageIndex ? "var(--accent-glow)" : "transparent"); color:@(i == Model.PageIndex ? "var(--accent)" : "var(--text-dim)"); text-decoration:none; border-radius:2px;">@i</a>
+                        }
+                        @if (Model.HasNextPage)
+                        {
+                            <a href="@Url.Action("Users", "Admin", new { page = Model.PageIndex + 1 })"
+                               style="font-family:var(--font-hud); font-size:0.7rem; letter-spacing:0.1em; padding:0.35rem 0.75rem; border:1px solid var(--border); color:var(--text-dim); text-decoration:none; border-radius:2px;">NEXT →</a>
+                        }
+                    </div>
                 }
-                @for (int i = 1; i <= Model.TotalPages; i++)
-                {
-                    <a href="@Url.Action("Users", "Admin", new { page = i })"
-                       style="padding:0.35rem 0.65rem;border:1px solid @(i == Model.PageIndex ? "var(--accent)" : "var(--border)");background:@(i == Model.PageIndex ? "var(--accent-glow)" : "transparent");color:@(i == Model.PageIndex ? "var(--accent)" : "var(--text-dim)");border-radius:2px;font-family:var(--font-mono);font-size:0.7rem;text-decoration:none;">@i</a>
-                }
-                @if (Model.HasNextPage)
-                {
-                    <a href="@Url.Action("Users", "Admin", new { page = Model.PageIndex + 1 })" class="admin-quick-link" style="padding:0.35rem 0.75rem;border:1px solid var(--border);border-radius:2px;font-size:0.65rem;">NEXT →</a>
-                }
-            </div>
-        }
-    }
-</div>
-
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content" style="background:var(--bg-card);border:1px solid var(--border);border-radius:3px;">
-            <div class="modal-header" style="border-bottom:1px solid var(--border);background:rgba(216,64,64,0.08);">
-                <h5 class="modal-title" style="font-family:var(--font-hud);font-weight:700;letter-spacing:0.15em;color:#e88080;">⚠ CONFIRM DELETE</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" style="color:var(--text-dim);font-size:0.85rem;">
-                <p>Delete user <strong id="modalUserName" style="color:var(--text-primary);font-family:var(--font-hud);"></strong>?</p>
-                <p style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);">This will permanently remove all associated data including files and preferences.</p>
-            </div>
-            <div class="modal-footer" style="border-top:1px solid var(--border);gap:0.5rem;">
-                <button type="button" data-bs-dismiss="modal"
-                        style="font-family:var(--font-hud);font-size:0.75rem;font-weight:700;letter-spacing:0.1em;padding:0.45rem 1rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);border-radius:2px;cursor:pointer;">
-                    CANCEL
-                </button>
-                <form id="deleteForm" method="post" style="display:inline;">
-                    @Html.AntiForgeryToken()
-                    <button type="submit"
-                            style="font-family:var(--font-hud);font-size:0.75rem;font-weight:700;letter-spacing:0.1em;padding:0.45rem 1rem;background:rgba(216,64,64,0.15);border:1px solid rgba(216,64,64,0.4);color:#e88080;border-radius:2px;cursor:pointer;">
-                        CONFIRM DELETE
-                    </button>
-                </form>
             </div>
         </div>
     </div>
-</div>
 
-<script>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header danger">
+                    <h5 class="modal-title" id="deleteModalLabel">
+                        <span class="modal-icon">⚠</span> CONFIRM DELETION
+                    </h5>
+                    <button type="button" class="btn-close-hud" data-bs-dismiss="modal" aria-label="Close">✕</button>
+                </div>
+                <div class="modal-body">
+                    <p>You are about to permanently delete the account for:</p>
+                    <p style="font-family:var(--font-hud); font-size:1.05rem; color:var(--text-primary); letter-spacing:0.1em; margin:0.5rem 0;">
+                        <strong id="modalUserName"></strong>
+                    </p>
+                    <div class="warning-note">
+                        <span>⚠</span>
+                        <span>This action is irreversible. All associated data including files and preferences will be permanently removed.</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel-hud" data-bs-dismiss="modal">CANCEL</button>
+                    <form id="deleteForm" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-danger-hud">
+                            <i class="fas fa-trash"></i> DELETE USER
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
     document.getElementById('deleteModal').addEventListener('show.bs.modal', function (event) {
         var button = event.relatedTarget;
-        document.getElementById('modalUserName').textContent = button.getAttribute('data-user-name');
-        document.getElementById('deleteForm').action = '@Url.Action("DeleteUser", "Admin")/' + button.getAttribute('data-user-id');
+        var userId = button.getAttribute('data-user-id');
+        var userName = button.getAttribute('data-user-name');
+        document.getElementById('modalUserName').textContent = userName;
+        document.getElementById('deleteForm').action = '@Url.Action("DeleteUser", "Admin")/' + userId;
     });
-</script>
+    </script>
