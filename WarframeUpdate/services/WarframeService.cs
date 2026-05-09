@@ -49,7 +49,7 @@ namespace WarframeTracker.Services
             var (vallisCycle, vallisStale) = await vallisCycleTask;
 
             var fissures = (fissuresRaw ?? new List<FissureModel>())
-                .Where(f => f.Expiry > DateTime.UtcNow)
+                .Where(f => f.Expiry > DateTime.UtcNow && !f.IsStorm)
                 .OrderBy(f => f.Expiry)
                 .ToList();
 

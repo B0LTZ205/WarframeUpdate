@@ -2577,3 +2577,47 @@ body {
         opacity: 1;
     }
 
+/* ── Fissure Tabs ───────────────────────────── */
+.fissure-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.fissure-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-dim);
+    font-family: var(--font-hud);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    padding: 0.6rem 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+}
+
+    .fissure-tab:hover {
+        color: var(--text-primary);
+        background: rgba(58, 159, 216, 0.04);
+    }
+
+    .fissure-tab.active {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+        background: rgba(58, 159, 216, 0.06);
+    }
+
+    .fissure-tab[data-tab="steelpath"].active {
+        color: var(--gold);
+        border-bottom-color: var(--gold);
+        background: rgba(200, 168, 75, 0.06);
+    }
+
+.fissure-row--hard .tier-badge {
+    box-shadow: 0 0 6px rgba(200, 168, 75, 0.3);
+}
+

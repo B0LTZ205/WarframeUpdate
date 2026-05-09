@@ -231,55 +231,83 @@
     <section id="fissures" class="card card--fissures">
         <div class="card-header">
             <div class="card-title-block">
-                <span class="card-icon"><i class="fas fa-circle-nodes"></i></span>
+                <span class="card-icon">◈</span>
                 <div>
                     <h2 class="card-title">VOID FISSURES</h2>
                     <span class="card-subtitle">ACTIVE TEARS</span>
                 </div>
             </div>
         </div>
+
+        <!-- Fissure Tabs -->
+        <div class="fissure-tabs">
+            <button class="fissure-tab active" data-tab="normal">NORMAL</button>
+            <button class="fissure-tab" data-tab="steelpath">⚔ STEEL PATH</button>
+        </div>
+
         <div class="card-body">
             @if (Model != null && Model.Fissures != null && Model.Fissures.Count > 0)
             {
-                // Show all fissures, not just active ones
-                var fissuresToShow = Model.Fissures.OrderBy(f => f.TierNum).ToList();
-                var itemsToShowInitially = 5;
+                var normalFissures = Model.Fissures.Where(f => !f.IsHard).OrderBy(f => f.TierNum).ToList();
+                var steelPathFissures = Model.Fissures.Where(f => f.IsHard).OrderBy(f => f.TierNum).ToList();
 
-                if (fissuresToShow != null && fissuresToShow.Count > 0)
-                {
-                    <div class="fissures-container">
-                        @for (int i = 0; i < fissuresToShow.Count; i++)
-                        {
-                            var fissure = fissuresToShow[i];
-                            var tierClass = (fissure.Tier ?? "lith").ToLower();
-                            var hiddenClass = i >= itemsToShowInitially ? "fissure-hidden" : "";
-
-                            <div class="fissure-row @hiddenClass">
-                                <div class="fissure-tier">
-                                    <span class="tier-badge @tierClass">@((fissure.Tier ?? "LITH").ToUpper())</span>
-                                </div>
-                                <div class="fissure-info">
-                                    <div class="fissure-mission">@fissure.MissionType</div>
-                                    <div class="fissure-node">@fissure.Node</div>
-                                </div>
-                                <div class="fissure-time">
-                                    <span class="countdown" data-expiry="@fissure.Expiry">--:--</span>
-                                </div>
-                            </div>
-                        }
-                    </div>
-
-                    if (fissuresToShow.Count > itemsToShowInitially)
+                <!-- Normal fissures panel -->
+                <div class="fissure-panel" id="panel-normal">
+                    @if (normalFissures.Count > 0)
                     {
-                        <button type="button" class="btn-show-more" id="fissureShowMore" data-total="@fissuresToShow.Count" data-shown="@itemsToShowInitially" onclick="return false;">
-                            SHOW MORE (@(fissuresToShow.Count - itemsToShowInitially) MORE)
-                        </button>
+                        <div class="fissures-container">
+                            @foreach (var fissure in normalFissures)
+                            {
+                                var tierClass = (fissure.Tier ?? "lith").ToLower();
+                                <div class="fissure-row">
+                                    <div class="fissure-tier">
+                                        <span class="tier-badge @tierClass">@((fissure.Tier ?? "LITH").ToUpper())</span>
+                                    </div>
+                                    <div class="fissure-info">
+                                        <div class="fissure-mission">@fissure.MissionType</div>
+                                        <div class="fissure-node">@fissure.Node</div>
+                                    </div>
+                                    <div class="fissure-time">
+                                        <span class="countdown" data-expiry="@fissure.Expiry.ToUniversalTime().ToString("o")">--:--</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     }
-                }
-                else
-                {
-                    <div class="error-state">No fissures available</div>
-                }
+                    else
+                    {
+                        <div class="error-state">No normal fissures available</div>
+                    }
+                </div>
+
+                <!-- Steel Path fissures panel -->
+                <div class="fissure-panel" id="panel-steelpath" style="display:none;">
+                    @if (steelPathFissures.Count > 0)
+                    {
+                        <div class="fissures-container">
+                            @foreach (var fissure in steelPathFissures)
+                            {
+                                var tierClass = (fissure.Tier ?? "lith").ToLower();
+                                <div class="fissure-row fissure-row--hard">
+                                    <div class="fissure-tier">
+                                        <span class="tier-badge @tierClass">@((fissure.Tier ?? "LITH").ToUpper())</span>
+                                    </div>
+                                    <div class="fissure-info">
+                                        <div class="fissure-mission">@fissure.MissionType</div>
+                                        <div class="fissure-node">@fissure.Node</div>
+                                    </div>
+                                    <div class="fissure-time">
+                                        <span class="countdown" data-expiry="@fissure.Expiry.ToUniversalTime().ToString("o")">--:--</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="error-state">No Steel Path fissures available</div>
+                    }
+                </div>
             }
             else
             {
@@ -287,6 +315,7 @@
             }
         </div>
     </section>
+
 
     <!-- ═══ DAILY DEALS ═══ -->
     <section id="deals" class="card card--deals">

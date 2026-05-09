@@ -90,6 +90,9 @@ namespace WarframeTracker.Models
 
         [JsonProperty("isStorm")]
         public bool IsStorm { get; set; }
+
+        [JsonProperty("isHard")]
+        public bool IsHard { get; set; }
     }
 
     // ── Void Trader ────────────────────────────────────────

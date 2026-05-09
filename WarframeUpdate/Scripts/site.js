@@ -111,6 +111,7 @@ async function refreshDashboardData() {
             // Re-init animations on new cards
             initAnimations();
             initFissureShowMore();
+            initFissureTabs();
             
             // Trigger immediate countdown update
             tickCountdowns();
@@ -182,6 +183,24 @@ function initNavHighlight() {
     sections.forEach(s => observer.observe(s));
 }
 
+
+// ── Fissure Tabs (Normal / Steel Path) ───────────────────
+function initFissureTabs() {
+    document.querySelectorAll('.fissure-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            var targetTab = this.getAttribute('data-tab');
+            document.querySelectorAll('.fissure-tab').forEach(function (t) {
+                t.classList.remove('active');
+            });
+            this.classList.add('active');
+            document.querySelectorAll('.fissure-panel').forEach(function (panel) {
+                panel.style.display = panel.id === 'panel-' + targetTab ? '' : 'none';
+            });
+        });
+    });
+}
+
+
 // ── Show More/Less for Fissures ──────────────────────────
 function initFissureShowMore() {
     const showMoreBtn = document.getElementById('fissureShowMore');
@@ -236,6 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAnimations();
     initNavHighlight();
     initFissureShowMore();
+    initFissureTabs();
 
     // Tick every second
     setInterval(() => {
