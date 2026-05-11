@@ -94,26 +94,26 @@ body {
 }
 
 .header-inner {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 clamp(1rem, 2vw, 2rem);
     height: 64px;
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: clamp(0.5rem, 1.5vw, 1.5rem);
 }
 
 .logo-block {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
     text-decoration: none;
     color: inherit;
     flex-shrink: 0;
 }
 
 .logo-emblem {
-    font-size: 2rem;
+    font-size: clamp(1.4rem, 2vw, 2rem);
     color: var(--accent);
     filter: drop-shadow(0 0 8px var(--accent));
     animation: pulse-glow 3s ease-in-out infinite;
@@ -137,7 +137,7 @@ body {
 
 .logo-main {
     font-family: var(--font-hud);
-    font-size: 1.4rem;
+    font-size: clamp(0.95rem, 1.4vw, 1.4rem);
     font-weight: 700;
     letter-spacing: 0.2em;
     color: var(--text-primary);
@@ -152,20 +152,28 @@ body {
 
 .header-nav {
     display: flex;
-    gap: 0.25rem;
+    align-items: center;
+    gap: clamp(0rem, 0.3vw, 0.25rem);
     margin-left: auto;
+    flex-wrap: nowrap;
+}
+
+/* Nav-item divs (Admin Panel wrapper) must behave as flex items */
+.header-nav .nav-item {
+    display: contents;
 }
 
 .nav-link {
     font-family: var(--font-hud);
-    font-size: 0.75rem;
+    font-size: clamp(0.65rem, 0.8vw, 0.8rem);
     font-weight: 600;
-    letter-spacing: 0.15em;
+    letter-spacing: clamp(0.04em, 0.3vw, 0.12em);
     color: var(--text-dim);
     text-decoration: none;
-    padding: 0.4rem 0.75rem;
+    padding: clamp(0.25rem, 0.4vw, 0.4rem) clamp(0.35rem, 0.6vw, 0.65rem);
     border: 1px solid transparent;
     border-radius: 2px;
+    white-space: nowrap;
     transition: all 0.2s;
 }
 
@@ -178,11 +186,12 @@ body {
 .header-status {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
     font-family: var(--font-mono);
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     color: var(--green);
     flex-shrink: 0;
+    letter-spacing: 0.06em;
 }
 
 .status-dot {
@@ -348,7 +357,11 @@ body {
     }
 }
 
-/* Grid placement */
+/* ── Grid placement ─────────────────────────────
+   Row 1 : sortie(4)  + trader(4)   + nightwave(4) = 12
+   Row 2 : archon(6)  + incarnon(3) + deals(3)     = 12
+   Row 3 : fissures(8)              + invasions(4)  = 12
+   ─────────────────────────────────────────────── */
 .card--sortie {
     grid-column: span 4;
     animation-delay: 0.05s;
@@ -364,19 +377,65 @@ body {
     animation-delay: 0.15s;
 }
 
-.card--fissures {
+.card--archon {
     grid-column: span 6;
-    animation-delay: 0.2s;
+    animation-delay: 0.18s;
+}
+
+.card--incarnon {
+    grid-column: span 3;
+    animation-delay: 0.21s;
 }
 
 .card--deals {
     grid-column: span 3;
-    animation-delay: 0.25s;
+    animation-delay: 0.24s;
+}
+
+.card--arbitration {
+    grid-column: span 3;
+    animation-delay: 0.24s;
+}
+
+.card--fissures {
+    grid-column: span 8;
+    animation-delay: 0.27s;
 }
 
 .card--invasions {
-    grid-column: span 3;
-    animation-delay: 0.3s;
+    grid-column: span 4;
+    animation-delay: 0.30s;
+}
+
+/* ── Scrollable card bodies ─────────────────── */
+.nightwave-body {
+    max-height: 420px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-glow) transparent;
+}
+
+.invasions-body {
+    max-height: 520px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-glow) transparent;
+}
+
+.nightwave-body::-webkit-scrollbar,
+.invasions-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.nightwave-body::-webkit-scrollbar-track,
+.invasions-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.nightwave-body::-webkit-scrollbar-thumb,
+.invasions-body::-webkit-scrollbar-thumb {
+    background: var(--border-glow);
+    border-radius: 2px;
 }
 
 @media (max-width: 1100px) {
@@ -384,16 +443,28 @@ body {
         grid-column: span 6;
     }
 
-    .card--fissures {
-        grid-column: span 7;
+    .card--archon {
+        grid-column: span 8;
+    }
+
+    .card--incarnon {
+        grid-column: span 4;
     }
 
     .card--deals {
-        grid-column: span 5;
+        grid-column: span 12;
+    }
+
+    .card--arbitration {
+        grid-column: span 6;
+    }
+
+    .card--fissures {
+        grid-column: span 8;
     }
 
     .card--invasions {
-        grid-column: span 12;
+        grid-column: span 4;
     }
 }
 
@@ -444,6 +515,143 @@ body {
 .card--nightwave .card-icon {
     color: var(--purple);
     filter: drop-shadow(0 0 7px rgba(154,80,216,0.8));
+}
+
+/* ── Arbitration Card ───────────────────────── */
+.card--arbitration .card-icon {
+    color: #f87a4a;
+    filter: drop-shadow(0 0 7px rgba(248,122,74,0.8));
+}
+
+.arbitration-node {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.85rem;
+    margin-bottom: 0.85rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.arbitration-icon {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.arbitration-location {
+    font-family: var(--font-hud);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
+}
+
+.arbitration-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.arbitration-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.arb-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+}
+
+.arb-value {
+    font-family: var(--font-hud);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.arbitration-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+    padding: 0.25rem 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    border-radius: 2px;
+    width: fit-content;
+}
+
+.archwing-tag {
+    background: rgba(154, 80, 216, 0.1);
+    border: 1px solid rgba(154, 80, 216, 0.3);
+    color: var(--purple);
+}
+
+/* ── Incarnon Genesis Card ───────────────────── */
+.card--incarnon .card-icon {
+    color: #b06fe8;
+    filter: drop-shadow(0 0 7px rgba(154,80,216,0.8));
+}
+
+.incarnon-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.incarnon-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.5rem 0.65rem;
+    background: rgba(0,0,0,0.15);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    transition: background 0.15s;
+}
+
+    .incarnon-row:hover {
+        background: rgba(154, 80, 216, 0.06);
+        border-color: rgba(154, 80, 216, 0.25);
+    }
+
+.incarnon-type-badge {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    padding: 0.15rem 0.45rem;
+    border-radius: 2px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+    .incarnon-type-badge.primary {
+        background: rgba(58, 159, 216, 0.1);
+        border: 1px solid rgba(58, 159, 216, 0.3);
+        color: var(--accent);
+    }
+
+    .incarnon-type-badge.secondary {
+        background: rgba(200, 168, 75, 0.1);
+        border: 1px solid rgba(200, 168, 75, 0.3);
+        color: var(--gold);
+    }
+
+    .incarnon-type-badge.melee {
+        background: rgba(216, 64, 64, 0.1);
+        border: 1px solid rgba(216, 64, 64, 0.3);
+        color: #e88080;
+    }
+
+.incarnon-name {
+    font-family: var(--font-hud);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
 }
 
 .card--fissures .card-icon {
@@ -2620,4 +2828,102 @@ body {
 .fissure-row--hard .tier-badge {
     box-shadow: 0 0 6px rgba(200, 168, 75, 0.3);
 }
+
+/* ── Archon Hunt Card ────────────────────────── */
+.card--archon .card-icon {
+    color: #e85050;
+    filter: drop-shadow(0 0 7px rgba(216, 64, 64, 0.9));
+}
+
+.archon-mission {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+    .archon-mission:last-of-type {
+        border-bottom: none;
+    }
+
+    .archon-mission--boss {
+        background: rgba(216, 64, 64, 0.05);
+        border-bottom: none;
+        padding: 0.75rem 0.65rem;
+        margin: 0.5rem -0.65rem 0;
+        border-radius: 2px;
+        border: 1px solid rgba(216, 64, 64, 0.2);
+    }
+
+        .archon-mission--boss .mission-num {
+            color: #e85050;
+        }
+
+        .archon-mission--boss .mission-type {
+            color: #f89090;
+        }
+
+.archon-boss-tag {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    padding: 0.2rem 0.55rem;
+    background: rgba(216, 64, 64, 0.12);
+    border: 1px solid rgba(216, 64, 64, 0.35);
+    color: #e88080;
+    border-radius: 2px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+/* Archon Shard strip */
+.archon-shard-strip {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.85rem;
+    margin-bottom: 0.9rem;
+    border-radius: 3px;
+    border-left: 3px solid currentColor;
+    background: rgba(0,0,0,0.25);
+}
+
+.shard-gem {
+    font-size: 1.4rem;
+    line-height: 1;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 6px currentColor);
+}
+
+.shard-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.shard-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.shard-name {
+    font-family: var(--font-hud);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Shard colour variants */
+.shard-amber  { color: #f0a040; border-left-color: #f0a040; background: rgba(240,160,64,0.07);  }
+.shard-azure  { color: #40b8f0; border-left-color: #40b8f0; background: rgba(64,184,240,0.07);  }
+.shard-crimson{ color: #e85050; border-left-color: #e85050; background: rgba(232,80,80,0.07);   }
+.shard-emerald{ color: #40d880; border-left-color: #40d880; background: rgba(64,216,128,0.07);  }
+.shard-topaz  { color: #e8d040; border-left-color: #e8d040; background: rgba(232,208,64,0.07);  }
+.shard-violet { color: #c060f0; border-left-color: #c060f0; background: rgba(192,96,240,0.07);  }
+.shard-default{ color: var(--gold); border-left-color: var(--gold); background: rgba(200,168,75,0.07); }
 

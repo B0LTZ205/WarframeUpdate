@@ -1,4 +1,5 @@
-﻿@model WarframeTracker.Models.DashboardViewModel
+@model WarframeTracker.Models.DashboardViewModel
+@using WarframeTracker.Models
 @{
     ViewBag.Title = "Dashboard";
 }
@@ -33,6 +34,10 @@
 </div>
 
 <div class="dashboard">
+
+    <!-- ══════════════════════════════════════════════════════
+         ROW 1 — SORTIE (4) · BARO (4) · NIGHTWAVE (4)
+         ══════════════════════════════════════════════════════ -->
 
     <!-- ═══ SORTIE ═══ -->
     <section id="sortie" class="card card--sortie">
@@ -162,7 +167,7 @@
                 </div>
             </div>
         </div>
-        <div class="card-body">
+        <div class="card-body nightwave-body">
             @if (Model.Nightwave != null && Model.Nightwave.ActiveChallenges != null)
             {
                 var daily = Model.Nightwave.ActiveChallenges.FindAll(c => c.IsDaily && !c.IsElite);
@@ -227,95 +232,120 @@
         </div>
     </section>
 
-    <!-- ═══ VOID FISSURES ═══ -->
-    <section id="fissures" class="card card--fissures">
+    <!-- ══════════════════════════════════════════════════════
+         ROW 2 — ARCHON HUNT (6) · INCARNON (3) · DEALS (3)
+         ══════════════════════════════════════════════════════ -->
+
+    <!-- ═══ ARCHON HUNT ═══ -->
+    <section id="archonhunt" class="card card--archon">
         <div class="card-header">
             <div class="card-title-block">
-                <span class="card-icon">◈</span>
+                <span class="card-icon">💀</span>
                 <div>
-                    <h2 class="card-title">VOID FISSURES</h2>
-                    <span class="card-subtitle">ACTIVE TEARS</span>
+                    <h2 class="card-title">ARCHON HUNT</h2>
+                    @if (Model.ArchonHunt != null)
+                    {
+                        <span class="card-subtitle">@Model.ArchonHunt.Faction &nbsp;·&nbsp; @Model.ArchonHunt.Boss</span>
+                    }
+                    else
+                    {
+                        <span class="card-subtitle">WEEKLY MISSION</span>
+                    }
                 </div>
             </div>
-        </div>
-
-        <!-- Fissure Tabs -->
-        <div class="fissure-tabs">
-            <button class="fissure-tab active" data-tab="normal">NORMAL</button>
-            <button class="fissure-tab" data-tab="steelpath">⚔ STEEL PATH</button>
-        </div>
-
-        <div class="card-body">
-            @if (Model != null && Model.Fissures != null && Model.Fissures.Count > 0)
+            @if (Model.ArchonHunt != null)
             {
-                var normalFissures = Model.Fissures.Where(f => !f.IsHard).OrderBy(f => f.TierNum).ToList();
-                var steelPathFissures = Model.Fissures.Where(f => f.IsHard).OrderBy(f => f.TierNum).ToList();
-
-                <!-- Normal fissures panel -->
-                <div class="fissure-panel" id="panel-normal">
-                    @if (normalFissures.Count > 0)
-                    {
-                        <div class="fissures-container">
-                            @foreach (var fissure in normalFissures)
-                            {
-                                var tierClass = (fissure.Tier ?? "lith").ToLower();
-                                <div class="fissure-row">
-                                    <div class="fissure-tier">
-                                        <span class="tier-badge @tierClass">@((fissure.Tier ?? "LITH").ToUpper())</span>
-                                    </div>
-                                    <div class="fissure-info">
-                                        <div class="fissure-mission">@fissure.MissionType</div>
-                                        <div class="fissure-node">@fissure.Node</div>
-                                    </div>
-                                    <div class="fissure-time">
-                                        <span class="countdown" data-expiry="@fissure.Expiry.ToUniversalTime().ToString("o")">--:--</span>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="error-state">No normal fissures available</div>
-                    }
+                <div class="card-timer">
+                    <span class="timer-label">RESETS IN</span>
+                    <span class="timer-value countdown" data-expiry="@Model.ArchonHunt.Expiry.ToUniversalTime().ToString("o")">--:--:--</span>
                 </div>
+            }
+        </div>
+        <div class="card-body">
+            @if (Model.ArchonHunt != null && Model.ArchonHunt.Missions != null && Model.ArchonHunt.Missions.Count > 0)
+            {
+                var rewardLower = (Model.ArchonHunt.RewardPool ?? "").ToLower();
+                var shardClass  = rewardLower.Contains("amber")   ? "amber"   :
+                                  rewardLower.Contains("azure")   ? "azure"   :
+                                  rewardLower.Contains("crimson") ? "crimson" :
+                                  rewardLower.Contains("emerald") ? "emerald" :
+                                  rewardLower.Contains("topaz")   ? "topaz"   :
+                                  rewardLower.Contains("violet")  ? "violet"  : "default";
 
-                <!-- Steel Path fissures panel -->
-                <div class="fissure-panel" id="panel-steelpath" style="display:none;">
-                    @if (steelPathFissures.Count > 0)
-                    {
-                        <div class="fissures-container">
-                            @foreach (var fissure in steelPathFissures)
-                            {
-                                var tierClass = (fissure.Tier ?? "lith").ToLower();
-                                <div class="fissure-row fissure-row--hard">
-                                    <div class="fissure-tier">
-                                        <span class="tier-badge @tierClass">@((fissure.Tier ?? "LITH").ToUpper())</span>
-                                    </div>
-                                    <div class="fissure-info">
-                                        <div class="fissure-mission">@fissure.MissionType</div>
-                                        <div class="fissure-node">@fissure.Node</div>
-                                    </div>
-                                    <div class="fissure-time">
-                                        <span class="countdown" data-expiry="@fissure.Expiry.ToUniversalTime().ToString("o")">--:--</span>
-                                    </div>
-                                </div>
-                            }
+                @* Derive shard from boss name as fallback *@
+                if (shardClass == "default" && Model.ArchonHunt.Boss != null)
+                {
+                    var bossLower = Model.ArchonHunt.Boss.ToLower();
+                    shardClass = bossLower.Contains("boreal")  ? "azure"   :
+                                 bossLower.Contains("amar")    ? "crimson" :
+                                 bossLower.Contains("nira")    ? "amber"   : "default";
+                }
+
+                if (!string.IsNullOrEmpty(Model.ArchonHunt.RewardPool))
+                {
+                    <div class="archon-shard-strip shard-@shardClass">
+                        <span class="shard-gem">◆</span>
+                        <div class="shard-text">
+                            <span class="shard-label">THIS WEEK'S SHARD</span>
+                            <span class="shard-name">@Model.ArchonHunt.RewardPool</span>
                         </div>
-                    }
-                    else
-                    {
-                        <div class="error-state">No Steel Path fissures available</div>
-                    }
-                </div>
+                    </div>
+                }
+
+                int mNum = 1;
+                foreach (var mission in Model.ArchonHunt.Missions)
+                {
+                    bool isBoss = mNum == Model.ArchonHunt.Missions.Count;
+                    <div class="archon-mission @(isBoss ? "archon-mission--boss" : "")">
+                        <div class="mission-num">0@(mNum++)</div>
+                        <div class="mission-info">
+                            <div class="mission-type">@mission.Type</div>
+                            <div class="mission-node">@mission.Node</div>
+                        </div>
+                        @if (isBoss)
+                        {
+                            <div class="archon-boss-tag">ARCHON</div>
+                        }
+                    </div>
+                }
             }
             else
             {
-                <div class="error-state">Unable to load fissure data</div>
+                <div class="error-state">Unable to load Archon Hunt data</div>
             }
         </div>
     </section>
 
+    <!-- ═══ INCARNON GENESIS ═══ -->
+    <section id="incarnon" class="card card--incarnon">
+        <div class="card-header">
+            <div class="card-title-block">
+                <span class="card-icon">⚡</span>
+                <div>
+                    <h2 class="card-title">INCARNON GENESIS</h2>
+                    <span class="card-subtitle">SET @Model.IncarnOn.SetNumber OF @Model.IncarnOn.TotalSets &nbsp;·&nbsp; RESETS SUNDAY</span>
+                </div>
+            </div>
+            <div class="card-timer">
+                <span class="timer-label">RESETS IN</span>
+                <span class="timer-value countdown" data-expiry="@Model.IncarnOn.NextReset.ToUniversalTime().ToString("o")">--:--:--</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="incarnon-list">
+                @foreach (var weapon in Model.IncarnOn.Weapons)
+                {
+                    var typeClass = weapon.Type.ToString().ToLower();
+                    var typeIcon = weapon.Type == WeaponType.Primary ? "⬡" :
+                                   weapon.Type == WeaponType.Secondary ? "◈" : "⚔";
+                    <div class="incarnon-row">
+                        <span class="incarnon-type-badge @typeClass">@typeIcon @weapon.Type.ToString().ToUpper()</span>
+                        <span class="incarnon-name">@weapon.Name</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
 
     <!-- ═══ DAILY DEALS ═══ -->
     <section id="deals" class="card card--deals">
@@ -364,6 +394,140 @@
         </div>
     </section>
 
+    <!-- ═══ ARBITRATION (shown only when API returns valid data) ═══ -->
+    @if (Model.Arbitration != null)
+    {
+    <section id="arbitration" class="card card--arbitration">
+        <div class="card-header">
+            <div class="card-title-block">
+                <span class="card-icon">🎯</span>
+                <div>
+                    <h2 class="card-title">ARBITRATION</h2>
+                    <span class="card-subtitle">ELITE ALERT</span>
+                </div>
+            </div>
+            <div class="card-timer">
+                <span class="timer-label">ENDS IN</span>
+                <span class="timer-value countdown" data-expiry="@Model.Arbitration.ComputedExpiry">--:--:--</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="arbitration-node">
+                <span class="arbitration-icon">📍</span>
+                <span class="arbitration-location">@Model.Arbitration.Node</span>
+            </div>
+            <div class="arbitration-details">
+                <div class="arbitration-stat">
+                    <span class="arb-label">TYPE</span>
+                    <span class="arb-value">@Model.Arbitration.Type</span>
+                </div>
+                <div class="arbitration-stat">
+                    <span class="arb-label">ENEMY</span>
+                    <span class="arb-value">@Model.Arbitration.Enemy</span>
+                </div>
+                @if (Model.Arbitration.Archwing)
+                {
+                    <div class="arbitration-tag archwing-tag">⚙ ARCHWING</div>
+                }
+                @if (Model.Arbitration.IsSharkwing)
+                {
+                    <div class="arbitration-tag archwing-tag">🌊 SHARKWING</div>
+                }
+            </div>
+        </div>
+    </section>
+    }
+
+    <!-- ══════════════════════════════════════════════════════
+         ROW 3 — VOID FISSURES (8) · INVASIONS (4)
+         ══════════════════════════════════════════════════════ -->
+
+    <!-- ═══ VOID FISSURES ═══ -->
+    <section id="fissures" class="card card--fissures">
+        <div class="card-header">
+            <div class="card-title-block">
+                <span class="card-icon">◈</span>
+                <div>
+                    <h2 class="card-title">VOID FISSURES</h2>
+                    <span class="card-subtitle">ACTIVE TEARS</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="fissure-tabs">
+            <button class="fissure-tab active" data-tab="normal">NORMAL</button>
+            <button class="fissure-tab" data-tab="steelpath">⚔ STEEL PATH</button>
+        </div>
+
+        <div class="card-body">
+            @if (Model != null && Model.Fissures != null && Model.Fissures.Count > 0)
+            {
+                var normalFissures = Model.Fissures.Where(f => !f.IsHard).OrderBy(f => f.TierNum).ToList();
+                var steelPathFissures = Model.Fissures.Where(f => f.IsHard).OrderBy(f => f.TierNum).ToList();
+
+                <div class="fissure-panel" id="panel-normal">
+                    @if (normalFissures.Count > 0)
+                    {
+                        <div class="fissures-container">
+                            @foreach (var fissure in normalFissures)
+                            {
+                                var tierClass = (fissure.Tier ?? "lith").ToLower();
+                                <div class="fissure-row">
+                                    <div class="fissure-tier">
+                                        <span class="tier-badge @tierClass">@((fissure.Tier ?? "LITH").ToUpper())</span>
+                                    </div>
+                                    <div class="fissure-info">
+                                        <div class="fissure-mission">@fissure.MissionType</div>
+                                        <div class="fissure-node">@fissure.Node</div>
+                                    </div>
+                                    <div class="fissure-time">
+                                        <span class="countdown" data-expiry="@fissure.Expiry.ToUniversalTime().ToString("o")">--:--</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="error-state">No normal fissures available</div>
+                    }
+                </div>
+
+                <div class="fissure-panel" id="panel-steelpath" style="display:none;">
+                    @if (steelPathFissures.Count > 0)
+                    {
+                        <div class="fissures-container">
+                            @foreach (var fissure in steelPathFissures)
+                            {
+                                var tierClass = (fissure.Tier ?? "lith").ToLower();
+                                <div class="fissure-row fissure-row--hard">
+                                    <div class="fissure-tier">
+                                        <span class="tier-badge @tierClass">@((fissure.Tier ?? "LITH").ToUpper())</span>
+                                    </div>
+                                    <div class="fissure-info">
+                                        <div class="fissure-mission">@fissure.MissionType</div>
+                                        <div class="fissure-node">@fissure.Node</div>
+                                    </div>
+                                    <div class="fissure-time">
+                                        <span class="countdown" data-expiry="@fissure.Expiry.ToUniversalTime().ToString("o")">--:--</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="error-state">No Steel Path fissures available</div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="error-state">Unable to load fissure data</div>
+            }
+        </div>
+    </section>
+
     <!-- ═══ INVASIONS ═══ -->
     <section id="invasions" class="card card--invasions">
         <div class="card-header">
@@ -375,7 +539,7 @@
                 </div>
             </div>
         </div>
-        <div class="card-body">
+        <div class="card-body invasions-body">
             @if (Model.Invasions != null && Model.Invasions.Count > 0)
             {
                 var active = Model.Invasions.FindAll(i => !i.Completed);
@@ -433,4 +597,3 @@
     </section>
 
 </div>
-

@@ -68,6 +68,55 @@ namespace WarframeTracker.Models
     }
 
     // ── Void Fissures ──────────────────────────────────────
+    // ── Arbitration ────────────────────────────────────────
+    public class ArbitrationModel
+    {
+        [JsonProperty("node")]
+        public string Node { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("enemy")]
+        public string Enemy { get; set; }
+
+        [JsonProperty("archwing")]
+        public bool Archwing { get; set; }
+
+        [JsonProperty("isSharkwing")]
+        public bool IsSharkwing { get; set; }
+
+        [JsonProperty("expiry")]
+        public string Expiry { get; set; }
+
+        [JsonProperty("activation")]
+        public string Activation { get; set; }
+
+        // The API sometimes returns JS max date (+275760-...) for expiry.
+        // Fall back to activation + 1 hour since arbitrations always last exactly 1 hour.
+        [JsonIgnore]
+        public string ComputedExpiry
+        {
+            get
+            {
+                // Try the expiry field first — reject if it's JS max date (year > 9000)
+                if (DateTimeOffset.TryParse(Expiry, null,
+                        System.Globalization.DateTimeStyles.RoundtripKind, out var exp)
+                    && exp.Year < 9000)
+                {
+                    return exp.UtcDateTime.ToString("o");
+                }
+                // Fall back: activation + 1 hour
+                if (DateTimeOffset.TryParse(Activation, null,
+                        System.Globalization.DateTimeStyles.RoundtripKind, out var act))
+                {
+                    return act.UtcDateTime.AddHours(1).ToString("o");
+                }
+                return string.Empty;
+            }
+        }
+    }
+
     public class FissureModel
     {
         [JsonProperty("node")]
@@ -275,6 +324,54 @@ namespace WarframeTracker.Models
         public string TimeLeft { get; set; }
     }
 
+    // ── Incarnon Genesis ───────────────────────────────────
+    public enum WeaponType { Primary, Secondary, Melee }
+
+    public class IncarnOnWeapon
+    {
+        public string Name { get; set; }
+        public WeaponType Type { get; set; }
+    }
+
+    public class IncarnOnWeekModel
+    {
+        public int SetNumber { get; set; }        // 1-based set index
+        public int TotalSets { get; set; }
+        public List<IncarnOnWeapon> Weapons { get; set; }
+        public DateTime NextReset { get; set; }   // next Sunday 00:00 UTC
+    }
+
+    // ── Archon Hunt ────────────────────────────────────────
+    public class ArchonHuntModel
+    {
+        [JsonProperty("boss")]
+        public string Boss { get; set; }
+
+        [JsonProperty("faction")]
+        public string Faction { get; set; }
+
+        [JsonProperty("expiry")]
+        public DateTime Expiry { get; set; }
+
+        [JsonProperty("activation")]
+        public DateTime Activation { get; set; }
+
+        [JsonProperty("missions")]
+        public List<ArchonHuntMission> Missions { get; set; } = new List<ArchonHuntMission>();
+
+        [JsonProperty("rewardPool")]
+        public string RewardPool { get; set; }
+    }
+
+    public class ArchonHuntMission
+    {
+        [JsonProperty("node")]
+        public string Node { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+    }
+
     // ── Dashboard ViewModel ────────────────────────────────
     public class DashboardViewModel
     {
@@ -287,6 +384,8 @@ namespace WarframeTracker.Models
         public CetusCycleModel CetusCycle { get; set; }
         public VallisCycleModel VallisCycle { get; set; }
         public bool ApiOffline { get; set; }
-
+        public IncarnOnWeekModel IncarnOn { get; set; }
+        public ArbitrationModel Arbitration { get; set; }
+        public ArchonHuntModel ArchonHunt { get; set; }
     }
 }
