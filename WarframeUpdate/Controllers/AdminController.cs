@@ -67,17 +67,46 @@ namespace WarframeUpdate.Controllers
         }
 
         // GET: Admin/Users
-        public ActionResult Users(int page = 1)
+        public ActionResult Users(int page = 1, string search = "", string sortBy = "username", string sortOrder = "asc")
         {
             const int pageSize = 10;
-            var users = db.Users
-                .Include("UserProfile") 
-                .OrderBy(u => u.UserName)
+
+            var query = db.Users.Include("UserProfile").AsQueryable();
+
+            // Search by username or email
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.ToLower();
+                query = query.Where(u =>
+                    u.UserName.ToLower().Contains(term) ||
+                    u.Email.ToLower().Contains(term));
+            }
+
+            // Sort
+            switch ((sortBy ?? "username").ToLower())
+            {
+                case "email":
+                    query = sortOrder == "desc"
+                        ? query.OrderByDescending(u => u.Email)
+                        : query.OrderBy(u => u.Email);
+                    break;
+                case "emailstatus":
+                    query = sortOrder == "desc"
+                        ? query.OrderByDescending(u => u.EmailConfirmed)
+                        : query.OrderBy(u => u.EmailConfirmed);
+                    break;
+                default:
+                    query = sortOrder == "desc"
+                        ? query.OrderByDescending(u => u.UserName)
+                        : query.OrderBy(u => u.UserName);
+                    break;
+            }
+
+            var totalCount = query.Count();
+            var users = query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
-
-            var totalCount = db.Users.Count();
 
             var paginatedList = new PaginatedList<ApplicationUser>
             {
@@ -86,6 +115,10 @@ namespace WarframeUpdate.Controllers
                 PageIndex = page,
                 PageSize = pageSize
             };
+
+            ViewBag.Search    = search ?? "";
+            ViewBag.SortBy    = (sortBy ?? "username").ToLower();
+            ViewBag.SortOrder = sortOrder ?? "asc";
 
             LogAdminActivity("Viewed Users List");
             return View(paginatedList);

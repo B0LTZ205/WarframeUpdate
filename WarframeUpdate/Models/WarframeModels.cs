@@ -92,7 +92,6 @@ namespace WarframeTracker.Models
         [JsonProperty("activation")]
         public string Activation { get; set; }
 
-        // The API sometimes returns JS max date (+275760-...) for expiry.
         // Fall back to activation + 1 hour since arbitrations always last exactly 1 hour.
         [JsonIgnore]
         public string ComputedExpiry

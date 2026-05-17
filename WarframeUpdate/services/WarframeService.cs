@@ -222,20 +222,37 @@ namespace WarframeTracker.Services
                 var url = $"{endpoint}?language=en";
                 System.Diagnostics.Debug.WriteLine($"[WarframeService] Fetching {url}");
 
-                var json = await _client.GetStringAsync(url);
+                var response = await _client.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        $"[WarframeService] HTTP {(int)response.StatusCode} for {endpoint} — serving stale cache");
+                    return (stale, stale != null);
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
 
                 if (endpoint == "pc/invasions")
                     System.Diagnostics.Debug.WriteLine($"[WarframeService] Raw invasions JSON: {json.Substring(0, Math.Min(500, json.Length))}...");
 
                 var data = JsonConvert.DeserializeObject<T>(json);
 
-                lock (_cache)
+                // Only cache if we got something meaningful back
+                if (data != null)
                 {
-                    _cache[endpoint] = (data, DateTime.UtcNow.Add(cacheDuration));
+                    lock (_cache)
+                    {
+                        _cache[endpoint] = (data, DateTime.UtcNow.Add(cacheDuration));
+                    }
+                    System.Diagnostics.Debug.WriteLine($"[WarframeService] Successfully fetched {endpoint}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"[WarframeService] Null deserialization for {endpoint} — serving stale cache");
                 }
 
-                System.Diagnostics.Debug.WriteLine($"[WarframeService] Successfully fetched {endpoint}");
-                return (data, false);
+                return (data ?? stale, data == null && stale != null);
             }
             catch (Exception ex)
             {
