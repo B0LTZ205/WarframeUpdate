@@ -1,4 +1,4 @@
-﻿@model UserProfile
+@model WarframeUpdate.Models.UserProfile
 @{
     ViewBag.Title = "Edit Profile";
 }
@@ -8,26 +8,28 @@
         <div class="edit-profile-header">✏ EDIT PROFILE</div>
         <div class="edit-profile-body">
             @using (Html.BeginForm("UpdateProfile", "Manage", FormMethod.Post,
-                new { enctype = "multipart/form-data", novalidate = "novalidate" }))
+                new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
 
+                @Html.ValidationSummary(false, "", new { @class = "val-summary" })
+
                 <div class="mb-3">
-                    <label for="FirstName" class="form-label">FIRST NAME</label>
-                    <input type="text" id="FirstName" name="FirstName" class="form-control"
-                           value="@Model.FirstName" placeholder="Enter your first name" />
+                    @Html.LabelFor(m => m.FirstName, "FIRST NAME", new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", placeholder = "Enter your first name" })
+                    @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "val-msg" })
                 </div>
 
                 <div class="mb-3">
-                    <label for="LastName" class="form-label">LAST NAME</label>
-                    <input type="text" id="LastName" name="LastName" class="form-control"
-                           value="@Model.LastName" placeholder="Enter your last name" />
+                    @Html.LabelFor(m => m.LastName, "LAST NAME", new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", placeholder = "Enter your last name" })
+                    @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "val-msg" })
                 </div>
 
                 <div class="mb-3">
-                    <label for="PhoneNumber" class="form-label">PHONE NUMBER</label>
-                    <input type="tel" id="PhoneNumber" name="PhoneNumber" class="form-control"
-                           value="@Model.PhoneNumber" placeholder="(123) 456-7890" />
+                    @Html.LabelFor(m => m.PhoneNumber, "PHONE NUMBER", new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "(123) 456-7890", type = "tel" })
+                    @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "val-msg" })
                 </div>
 
                 <div class="mb-4">
@@ -38,6 +40,7 @@
                         <span class="input-group-text"><i class="fas fa-upload"></i></span>
                     </div>
                     <small class="form-text">Allowed: JPG, PNG, GIF — Max 5 MB</small>
+                    <span id="pictureError" class="inline-error"></span>
 
                     @if (Model != null && !string.IsNullOrEmpty(Model.ProfilePictureUrl))
                     {
@@ -50,7 +53,7 @@
                 </div>
 
                 <div style="display:flex;flex-direction:column;gap:0.5rem;">
-                    <button type="submit" class="btn btn-primary btn-lg">
+                    <button type="submit" id="profileSubmit" class="btn btn-primary btn-lg">
                         <i class="fas fa-save" style="margin-right:0.4rem;"></i> SAVE CHANGES
                     </button>
                     <a href="@Url.Action("Index", "Manage")" class="btn btn-secondary text-center">CANCEL</a>
@@ -61,18 +64,48 @@
 </div>
 
 <script>
-    document.getElementById('ProfilePicture').addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Profile picture must be less than 5 MB!');
-            e.target.value = '';
-            return;
+    (function () {
+        var fileInput  = document.getElementById('ProfilePicture');
+        var errorSpan  = document.getElementById('pictureError');
+        var submitBtn  = document.getElementById('profileSubmit');
+        var allowedExt = ['jpg', 'jpeg', 'png', 'gif'];
+        var maxBytes   = 5 * 1024 * 1024;
+
+        function showError(msg) {
+            errorSpan.textContent = msg;
+            errorSpan.classList.add('visible');
+            fileInput.classList.add('input-validation-error');
+            submitBtn.disabled = true;
         }
-        const ext = file.name.split('.').pop().toLowerCase();
-        if (!['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
-            alert('Only image files (jpg, png, gif) are allowed!');
-            e.target.value = '';
+
+        function clearError() {
+            errorSpan.textContent = '';
+            errorSpan.classList.remove('visible');
+            fileInput.classList.remove('input-validation-error');
+            submitBtn.disabled = false;
         }
-    });
+
+        fileInput.addEventListener('change', function () {
+            var file = this.files[0];
+            if (!file) { clearError(); return; }
+
+            var ext = file.name.split('.').pop().toLowerCase();
+
+            if (file.size > maxBytes) {
+                showError('⚠ File is too large. Maximum size is 5 MB.');
+                this.value = '';
+                return;
+            }
+            if (!allowedExt.includes(ext)) {
+                showError('⚠ Invalid file type. Allowed: JPG, PNG, GIF.');
+                this.value = '';
+                return;
+            }
+            clearError();
+        });
+    })();
 </script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

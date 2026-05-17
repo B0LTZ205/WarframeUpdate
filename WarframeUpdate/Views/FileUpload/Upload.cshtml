@@ -1,115 +1,131 @@
-﻿@{
+@{
     ViewBag.Title = "Upload File";
 }
 
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-lg-6 mx-auto">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">📤 Upload File</h4>
-                </div>
+<div class="dashboard" style="display:block; max-width:700px;">
+    <div class="card" style="padding:0;">
 
-                <div class="card-body">
-                    @if (ViewBag.ErrorMessage != null)
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            @ViewBag.ErrorMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    }
-
-                    @if (ViewBag.SuccessMessage != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            @ViewBag.SuccessMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    }
-
-                    @using (Html.BeginForm("Upload", "FileUpload", FormMethod.Post,
-                        new { enctype = "multipart/form-data", novalidate = "novalidate" }))
-                    {
-                        @Html.AntiForgeryToken()
-
-                        <div class="mb-3">
-                            <label for="file" class="form-label fw-bold">Select File:</label>
-                            <input type="file" id="file" name="HttpPostedFileBase" class="form-control" required />
-                            <small class="form-text text-muted d-block mt-2">
-                                Allowed: Images (jpg, png, gif), Videos (mp4, avi, mov), Audio (mp3, wav), Documents (pdf, doc, txt)<br />
-                                Max size: 50 MB
-                            </small>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="description" class="form-label fw-bold">Description (Optional):</label>
-                            <textarea id="description" name="description" class="form-control" rows="3"
-                                      placeholder="Add a description for this file..."></textarea>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-upload"></i> Upload File
-                            </button>
-                            <a href="@Url.Action("Index", "FileUpload")" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <!-- File Type Info -->
-            <div class="card mt-4">
-                <div class="card-header bg-info text-white">
-                    <h6 class="mb-0">ℹ️ Supported File Types</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <strong>Images:</strong>
-                            <ul class="small">
-                                <li>.jpg / .jpeg</li>
-                                <li>.png</li>
-                                <li>.gif / .bmp</li>
-                            </ul>
-                        </div>
-                        <div class="col-6">
-                            <strong>Media:</strong>
-                            <ul class="small">
-                                <li>Video: .mp4, .avi, .mov</li>
-                                <li>Audio: .mp3, .wav</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <hr />
-                    <strong>Documents:</strong>
-                    <ul class="small">
-                        <li>.pdf, .doc, .docx, .txt, .xls, .xlsx</li>
-                    </ul>
+        <div class="card-header">
+            <div class="card-title-block">
+                <span class="card-icon">📤</span>
+                <div>
+                    <h2 class="card-title">UPLOAD FILE</h2>
+                    <span class="card-subtitle">ATTACH DATA TO YOUR PROFILE</span>
                 </div>
             </div>
         </div>
+
+        <div class="card-body" style="padding:1.25rem;">
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="hud-banner hud-banner--error" style="margin-bottom:1rem;">
+                    <span class="hud-banner__icon">⚠</span>
+                    <span class="hud-banner__text">@TempData["ErrorMessage"]</span>
+                    <button class="hud-banner__close" onclick="this.closest('.hud-banner').remove()">✕</button>
+                </div>
+            }
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="val-summary" style="margin-bottom:1rem;">⚠ @ViewBag.ErrorMessage</div>
+            }
+
+            @using (Html.BeginForm("Upload", "FileUpload", FormMethod.Post,
+                new { enctype = "multipart/form-data", id = "uploadForm" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label for="file" class="form-label" style="font-family:var(--font-hud);font-size:0.7rem;font-weight:700;letter-spacing:0.15em;color:var(--text-dim);">SELECT FILE</label>
+                    <div style="display:flex; gap:0.5rem; align-items:center;">
+                        <input type="file" id="file" name="HttpPostedFileBase"
+                               class="form-control" style="background:var(--bg-card-alt);border:1px solid var(--border);color:var(--text-primary);border-radius:2px;" />
+                    </div>
+                    <span id="fileError" class="inline-error"></span>
+                    <small class="form-text" style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);margin-top:0.35rem;display:block;letter-spacing:0.04em;">
+                        IMAGES · VIDEOS · AUDIO · DOCUMENTS &nbsp;|&nbsp; MAX 50 MB
+                    </small>
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="form-label" style="font-family:var(--font-hud);font-size:0.7rem;font-weight:700;letter-spacing:0.15em;color:var(--text-dim);">DESCRIPTION <span style="color:var(--text-muted);font-weight:400;">(OPTIONAL)</span></label>
+                    <textarea id="description" name="description" rows="3"
+                              placeholder="Add a note about this file…"
+                              style="width:100%;background:var(--bg-card-alt);border:1px solid var(--border);color:var(--text-primary);font-family:var(--font-body);font-size:0.85rem;padding:0.5rem 0.75rem;border-radius:2px;resize:vertical;outline:none;"
+                              onfocus="this.style.borderColor='var(--accent-dim)'"
+                              onblur="this.style.borderColor='var(--border)'"></textarea>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                    <button type="submit" id="uploadBtn" class="btn btn-accent btn-lg w-100">
+                        <i class="fas fa-upload"></i> UPLOAD FILE
+                    </button>
+                    <a href="@Url.Action("Index", "FileUpload")" class="btn-cancel-hud w-100 text-center" style="padding:0.55rem 1rem;display:block;">CANCEL</a>
+                </div>
+            }
+
+            <!-- Allowed types reference -->
+            <div style="margin-top:1.5rem;padding:0.85rem;background:var(--bg-card-alt);border:1px solid var(--border);border-radius:2px;">
+                <p style="font-family:var(--font-mono);font-size:0.6rem;color:var(--accent);letter-spacing:0.12em;margin:0 0 0.6rem;">ALLOWED FILE TYPES</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem 1.5rem;font-family:var(--font-mono);font-size:0.62rem;color:var(--text-muted);">
+                    <div><span style="color:var(--text-dim);">IMAGES</span><br/>.jpg .jpeg .png .gif .bmp</div>
+                    <div><span style="color:var(--text-dim);">VIDEO</span><br/>.mp4 .avi .mov .mkv</div>
+                    <div><span style="color:var(--text-dim);">AUDIO</span><br/>.mp3 .wav .flac .aac</div>
+                    <div><span style="color:var(--text-dim);">DOCUMENTS</span><br/>.pdf .doc .docx .txt .xls .xlsx</div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
-<script>// Client-side file validation
-    document.getElementById('file').addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (!file) return;
+<script>
+(function () {
+    var fileInput  = document.getElementById('file');
+    var errorSpan  = document.getElementById('fileError');
+    var uploadBtn  = document.getElementById('uploadBtn');
+    var maxBytes   = 50 * 1024 * 1024;
+    var allowedExt = ['jpg','jpeg','png','gif','bmp','mp4','avi','mov','mkv',
+                      'mp3','wav','flac','aac','pdf','doc','docx','txt','xls','xlsx'];
 
-        const maxSize = 50 * 1024 * 1024; // 50 MB
-        const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'mp4', 'avi', 'mov', 'mkv',
-                                   'mp3', 'wav', 'flac', 'aac', 'pdf', 'doc', 'docx', 'txt', 'xls', 'xlsx'];
+    function showError(msg) {
+        errorSpan.textContent = msg;
+        errorSpan.classList.add('visible');
+        fileInput.classList.add('input-validation-error');
+        uploadBtn.disabled = true;
+    }
 
-        const ext = file.name.split('.').pop().toLowerCase();
+    function clearError() {
+        errorSpan.textContent = '';
+        errorSpan.classList.remove('visible');
+        fileInput.classList.remove('input-validation-error');
+        uploadBtn.disabled = false;
+    }
 
-        if (file.size > maxSize) {
-            alert('File size exceeds 50 MB limit!');
-            e.target.value = '';
+    fileInput.addEventListener('change', function () {
+        var file = this.files[0];
+        if (!file) { clearError(); return; }
+
+        var ext = file.name.split('.').pop().toLowerCase();
+
+        if (file.size > maxBytes) {
+            showError('⚠ File exceeds the 50 MB limit (' + (file.size / 1024 / 1024).toFixed(1) + ' MB).');
+            this.value = '';
             return;
         }
-
-        if (!allowedExtensions.includes(ext)) {
-            alert('This file type is not allowed!');
-            e.target.value = '';
+        if (!allowedExt.includes(ext)) {
+            showError('⚠ File type ".' + ext + '" is not allowed. See the list below.');
+            this.value = '';
+            return;
         }
-    });</script>
+        clearError();
+    });
+
+    document.getElementById('uploadForm').addEventListener('submit', function (e) {
+        if (!fileInput.files || fileInput.files.length === 0) {
+            e.preventDefault();
+            showError('⚠ Please select a file before uploading.');
+        }
+    });
+})();
+</script>

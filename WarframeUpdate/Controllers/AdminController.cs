@@ -1,6 +1,7 @@
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
+using System.ComponentModel.DataAnnotations;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -451,10 +452,17 @@ public ActionResult DeleteProfilePicture(string id)
     {
         public string Id { get; set; }
 
+        [Required(ErrorMessage = "Username is required.")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Username must be between 3 and 50 characters.")]
+        [Display(Name = "Username")]
         public string UserName { get; set; }
 
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        [Display(Name = "Email")]
         public string Email { get; set; }
 
+        [Display(Name = "Email Confirmed")]
         public bool EmailConfirmed { get; set; }
     }
 }

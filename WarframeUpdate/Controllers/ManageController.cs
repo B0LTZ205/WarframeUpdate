@@ -84,6 +84,11 @@ namespace WarframeUpdate.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult UpdateProfile(UserProfile model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
             var userId = User.Identity.GetUserId();
             var userProfile = db.UserProfiles.FirstOrDefault(p => p.UserId == userId);
 

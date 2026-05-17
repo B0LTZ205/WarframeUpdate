@@ -1501,6 +1501,93 @@ body {
     font-size: 0.65rem;
 }
 
+/* ── Form Validation ────────────────────────── */
+
+/*
+ * jQuery Unobtrusive Validation adds/removes these two classes on the
+ * <span data-valmsg-for="..."> elements rendered by Html.ValidationMessageFor.
+ * Defining them here ensures they work regardless of Bootstrap version.
+ */
+.field-validation-valid {
+    display: none !important;
+}
+
+.field-validation-error {
+    display: block !important;
+}
+
+/*
+ * MVC adds these to the ValidationSummary container div.
+ */
+.validation-summary-valid {
+    display: none !important;
+}
+
+.validation-summary-errors {
+    display: block !important;
+}
+
+/* Input border turns red when its field has an error */
+.input-validation-error {
+    border-color: var(--red) !important;
+    box-shadow: 0 0 0 2px rgba(216,64,64,0.18) !important;
+}
+
+/* Field-level error message — styling only, visibility controlled by classes above */
+.val-msg {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #ff7070;
+    letter-spacing: 0.03em;
+    margin-top: 0.35rem;
+    padding: 0.3rem 0.7rem;
+    border-left: 2px solid #ff5555;
+    background: rgba(255, 80, 80, 0.12);
+    border-radius: 0 2px 2px 0;
+}
+
+/* Validation summary block (multiple errors at top of form) */
+.val-summary {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: #ff8080;
+    background: rgba(255, 80, 80, 0.1);
+    border: 1px solid rgba(255, 80, 80, 0.4);
+    border-left: 3px solid #ff5555;
+    padding: 0.75rem 1rem;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+    letter-spacing: 0.03em;
+    line-height: 1.7;
+}
+
+    .val-summary ul {
+        margin: 0.35rem 0 0;
+        padding-left: 1.25rem;
+    }
+
+    .val-summary li {
+        margin: 0.2rem 0;
+    }
+
+/* Inline JS error used for file inputs (replaces browser alert()) */
+.inline-error {
+    display: none;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #ff7070;
+    margin-top: 0.35rem;
+    padding: 0.3rem 0.7rem;
+    border-left: 2px solid #ff5555;
+    background: rgba(255, 80, 80, 0.12);
+    border-radius: 0 2px 2px 0;
+    letter-spacing: 0.03em;
+}
+
+    .inline-error.visible {
+        display: block;
+    }
+
 /* ── Admin Dashboard ────────────────────────── */
 .admin-dashboard-wrap {
     max-width: 1400px;
